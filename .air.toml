@@ -2,10 +2,11 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-cmd = "go build -o ./tmp/main ./cmd/main.go"
-bin = "./tmp/main"
+cmd = "go build -o ./tmp/main ./cmd"
+bin = "tmp/main"
+full_bin = "tmp/main"
 include_ext = ["go", "tpl", "tmpl", "html"]
-exclude_dir = ["assets", "tmp", "vendor"]
+exclude_dir = ["tmp", "vendor"]
 include_dir = []
 exclude_file = []
 delay = 1000
@@ -22,4 +23,7 @@ build = "yellow"
 runner = "green"
 
 [misc]
-clean_on_exit = true 
+clean_on_exit = true
+
+[run]
+cmd = "./tmp/main"

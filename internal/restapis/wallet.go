@@ -1,4 +1,4 @@
-package servers
+package restapis
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/slilp/go-wallet/internal/servers/api_gen"
+	"github.com/slilp/go-wallet/internal/restapis/api_gen"
 )
 
 // (POST /secure/wallet)
@@ -17,7 +17,7 @@ func (h *HttpServer) CreateWallet(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.Utils.Validate.Struct(&req); err != nil {
+	if err := h.app.Utils.Validate.Struct(&req); err != nil {
 		var errors []string
 		for _, err := range err.(validator.ValidationErrors) {
 			errors = append(errors, err.Field()+" "+err.Tag()+" "+err.Param())
@@ -50,7 +50,7 @@ func (h *HttpServer) UpdateWallet(ctx *gin.Context, walletId string) {
 		return
 	}
 
-	if err := h.Utils.Validate.Struct(&req); err != nil {
+	if err := h.app.Utils.Validate.Struct(&req); err != nil {
 		var errors []string
 		for _, err := range err.(validator.ValidationErrors) {
 			errors = append(errors, err.Field()+" "+err.Tag()+" "+err.Param())

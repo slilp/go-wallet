@@ -1,0 +1,25 @@
+FROM golang:1.23-alpine
+
+# Install necessary tools
+RUN apk add --no-cache git curl
+
+# Install air (live reload)
+RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b /usr/local/bin
+
+WORKDIR /app
+
+# Copy go.mod and go.sum first for dependency caching
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the rest of the application code
+COPY . .
+
+# Copy air config if present
+COPY .air.toml .
+
+# Expose your API port (change if needed)
+EXPOSE 8080
+
+# Start air for live reloading
+CMD ["air"]

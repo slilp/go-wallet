@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  go-wallet-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    environment:
+      APP_PORT: 8080
+      DB_HOST: database
+      DB_NAME: wallet_db
+      DB_USERNAME: user
+      DB_PASSWORD: password
+      SECRET_TOKEN_KEY: MY_SECRET_TOKEN_KEY
+      ACCESS_TOKEN_DURATION: 200
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app
+    depends_on:
+      - database
+
+  database:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: wallet_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432

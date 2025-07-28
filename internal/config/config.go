@@ -10,15 +10,15 @@ import (
 var Config AppConfig
 
 type AppConfig struct {
-	AppPort                  string `mapstructure:"APP_PORT"`
-	SecretTokenKey           string `mapstructure:"SECRET_TOKEN_KEY"`
-	AccessTokenDuration      int    `mapstructure:"ACCESS_TOKEN_DURATION"`
-	RefreshTokenDuration     int    `mapstructure:"REFRESH_TOKEN_DURATION"`
-	DBHost                   string `mapstructure:"DB_HOST"`
-	DBName                   string `mapstructure:"DB_NAME"`
-	DBUsername               string `mapstructure:"DB_USERNAME"`
-	DBPassword               string `mapstructure:"DB_PASSWORD"`
-	DBMode                   string `mapstructure:"DB_MODE"`
+	AppPort              string `mapstructure:"APP_PORT"`
+	SecretTokenKey       string `mapstructure:"SECRET_TOKEN_KEY"`
+	AccessTokenDuration  int    `mapstructure:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenDuration int    `mapstructure:"REFRESH_TOKEN_DURATION"`
+	DBHost               string `mapstructure:"DB_HOST"`
+	DBName               string `mapstructure:"DB_NAME"`
+	DBUsername           string `mapstructure:"DB_USERNAME"`
+	DBPassword           string `mapstructure:"DB_PASSWORD"`
+	DBMode               string `mapstructure:"DB_MODE"`
 }
 
 func InitConfig() {

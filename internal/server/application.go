@@ -1,7 +1,8 @@
-package servers
+package server
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-migrate/migrate/v4"
@@ -13,28 +14,47 @@ import (
 	"gorm.io/gorm"
 )
 
-type HttpServer struct {
-	Services Services
+type Application struct {
+	Queries  Queries
+	Commands Commands
 	Utils    Utils
 }
 
-type Services struct {
+type Queries struct {
+}
+
+type Commands struct {
 }
 
 type Utils struct {
 	Validate *validator.Validate
 }
 
-func NewHttpServer(db *gorm.DB) *HttpServer {
-	return &HttpServer{
-		Services: Services{},
+func NewApiServer() *Application {
+
+	db, err := initDatabase()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if err := initMigrations(db); err != nil {
+		if err == migrate.ErrNoChange {
+			log.Println("No new migrations to apply.")
+		} else {
+			log.Panic("Error applying migrations:", err)
+		}
+	}
+
+	return &Application{
+		Queries:  Queries{},
+		Commands: Commands{},
 		Utils: Utils{
 			Validate: validator.New(),
 		},
 	}
 }
 
-func InitDatabase() (*gorm.DB, error) {
+func initDatabase() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s", config.Config.DBUsername, config.Config.DBPassword, config.Config.DBHost, config.Config.DBName, config.Config.DBMode)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -43,7 +63,7 @@ func InitDatabase() (*gorm.DB, error) {
 	return db, nil
 }
 
-func InitMigrations(db *gorm.DB) error {
+func initMigrations(db *gorm.DB) error {
 	sqlDB, err := db.DB()
 	if err != nil {
 		return fmt.Errorf("failed to get underlying sql.DB: %w", err)
