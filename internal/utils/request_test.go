@@ -1,7 +1,14 @@
 package utils_test
 
 import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+
 	"github.com/aarondl/null/v9"
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/slilp/go-wallet/internal/utils"
 )
 
@@ -52,5 +59,60 @@ func (suite *UtilsTestSuite) TestGetPaginationParams() {
 			suite.Equal(tc.wantLimit, limit)
 		})
 
+	}
+}
+
+func (suite *UtilsTestSuite) TestBindAndValidateRequestBody() {
+	type TestRequest struct {
+		Name  string `json:"name" validate:"required"`
+		Email string `json:"email" validate:"required,email"`
+	}
+
+	validate := validator.New()
+
+	tests := []struct {
+		name           string
+		body           map[string]interface{}
+		expectSuccess  bool
+		expectedStatus int
+	}{
+		{
+			name:           "ValidRequest",
+			body:           map[string]interface{}{"name": "John", "email": "john@example.com"},
+			expectSuccess:  true,
+			expectedStatus: 0, // no response written
+		},
+		{
+			name:           "MissingName",
+			body:           map[string]interface{}{"email": "john@example.com"},
+			expectSuccess:  false,
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "InvalidEmail",
+			body:           map[string]interface{}{"name": "John", "email": "not-an-email"},
+			expectSuccess:  false,
+			expectedStatus: http.StatusBadRequest,
+		},
+	}
+
+	for _, tc := range tests {
+		suite.Run(tc.name, func() {
+			gin.SetMode(gin.TestMode)
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			bodyBytes, _ := json.Marshal(tc.body)
+			c.Request, _ = http.NewRequest("POST", "/", bytes.NewBuffer(bodyBytes))
+			c.Request.Header.Set("Content-Type", "application/json")
+
+			var req TestRequest
+			ok := utils.BindAndValidateRequestBody(c, &req, validate)
+
+			suite.Equal(tc.expectSuccess, ok)
+			if !tc.expectSuccess {
+				suite.Equal(tc.expectedStatus, w.Code)
+			}
+		})
 	}
 }

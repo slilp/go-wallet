@@ -1,13 +1,19 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-migrate/migrate/v4"
 	postgres2 "github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/redis/go-redis/v9"
+	"github.com/slilp/go-wallet/internal/adapters"
 	"github.com/slilp/go-wallet/internal/config"
+	"github.com/slilp/go-wallet/internal/repositories"
+	"github.com/slilp/go-wallet/internal/services/commands"
+	"github.com/slilp/go-wallet/internal/services/queries"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"gorm.io/driver/postgres"
@@ -21,9 +27,14 @@ type Application struct {
 }
 
 type Queries struct {
+	ListWalletsService      queries.ListWalletsService
+	ListTransactionsService queries.ListTransactionsService
+	LoginService            queries.LoginService
 }
 
 type Commands struct {
+	RegisterService commands.RegisterService
+	WalletService   commands.WalletService
 }
 
 type Utils struct {
@@ -45,9 +56,27 @@ func NewApplicationServer() *Application {
 		}
 	}
 
+	redisClient, err := initRedisClient()
+	if err != nil {
+		log.Panic("Error initializing Redis client:", err)
+	}
+
+	redisAdapter := adapters.NewRedisAdapter(redisClient)
+
+	userRepo := repositories.NewUserRepository(db)
+	walletRepo := repositories.NewWalletRepository(db)
+	transactionRepo := repositories.NewTransactionRepository(db)
+
 	return &Application{
-		Queries:  Queries{},
-		Commands: Commands{},
+		Queries: Queries{
+			ListWalletsService:      queries.NewListWalletsService(walletRepo),
+			ListTransactionsService: queries.NewListTransactionsService(transactionRepo, redisAdapter),
+			LoginService:            queries.NewLoginService(userRepo),
+		},
+		Commands: Commands{
+			RegisterService: commands.NewRegisterService(userRepo),
+			WalletService:   commands.NewWalletService(walletRepo),
+		},
 		Utils: Utils{
 			Validate: validator.New(),
 		},
@@ -81,4 +110,18 @@ func initMigrations(db *gorm.DB) error {
 	}
 
 	return m.Up()
+}
+
+func initRedisClient() (*redis.Client, error) {
+	client := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", config.Config.RedisHost, config.Config.RedisPort),
+		Password: config.Config.RedisPassword,
+		DB:       0,
+	})
+
+	if err := client.Ping(context.Background()).Err(); err != nil {
+		return nil, fmt.Errorf("failed to connect to Redis: %w", err)
+	}
+
+	return client, nil
 }

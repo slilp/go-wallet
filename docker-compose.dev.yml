@@ -13,12 +13,16 @@ services:
       DB_PASSWORD: password
       SECRET_TOKEN_KEY: MY_SECRET_TOKEN_KEY
       ACCESS_TOKEN_DURATION: 200
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password
     ports:
       - "8080:8080"
     volumes:
       - ./:/app
     depends_on:
       - database
+      - redis
 
   database:
     image: postgres:latest
@@ -31,3 +35,12 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - 5432:5432
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "password"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data

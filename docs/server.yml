@@ -59,6 +59,7 @@ paths:
           description: Wallet created successfully
         default:
           $ref: "#/components/responses/ErrorResponse"
+  /secure/wallets:
     get:
       tags:
         - Wallet
@@ -72,24 +73,6 @@ paths:
         default:
           $ref: "#/components/responses/ErrorResponse"
   /secure/wallet/{walletId}:
-    get:
-      tags:
-        - Wallet
-      summary: Get wallet by ID
-      operationId: getWalletById
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: walletId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          $ref: "#/components/responses/WalletInfoResponse"
-        default:
-          $ref: "#/components/responses/ErrorResponse"
     put:
       tags:
         - Wallet
@@ -187,7 +170,7 @@ paths:
       tags:
         - Transactions
       summary: Deposit into a wallet
-      operationId: depositMoney
+      operationId: depositPoints
       security:
         - bearerAuth: []
       requestBody:
@@ -206,7 +189,7 @@ paths:
       tags:
         - Transactions
       summary: Withdraw from a wallet
-      operationId: withdrawMoney
+      operationId: withdrawPoints
       security:
         - bearerAuth: []
       requestBody:
@@ -218,56 +201,6 @@ paths:
       responses:
         "200":
           description: Withdrawal successful
-        default:
-          $ref: "#/components/responses/ErrorResponse"
-  /secure/transaction/{transactionId}:
-    get:
-      tags:
-        - Transactions
-      summary: Get transaction by ID
-      operationId: getTransactionDetails
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: transactionId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Transaction details
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: "#/components/schemas/TransactionResponseData"
-        default:
-          $ref: "#/components/responses/ErrorResponse"
-    patch:
-      tags:
-        - Transactions
-      summary: Update transaction description
-      operationId: updateTransactionDescription
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: transactionId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateTransactionDescRequest"
-      responses:
-        "200":
-          description: Transaction updated successfully
         default:
           $ref: "#/components/responses/ErrorResponse"
 components:
@@ -394,7 +327,7 @@ components:
         - updatedAt
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
         description:
@@ -483,7 +416,7 @@ components:
           type: string
         type:
           type: string
-          enum: [deposit, withdraw, transfer_in, transfer_out]
+          enum: [deposit, withdraw, transfer]
           description: Transaction type
         amount:
           type: number

@@ -21,37 +21,28 @@ type ServerInterface interface {
 	RegisterUser(c *gin.Context)
 	// Deposit into a wallet
 	// (POST /secure/deposit)
-	DepositMoney(c *gin.Context)
-	// Get transaction by ID
-	// (GET /secure/transaction/{transactionId})
-	GetTransactionDetails(c *gin.Context, transactionId string)
-	// Update transaction description
-	// (PATCH /secure/transaction/{transactionId})
-	UpdateTransactionDescription(c *gin.Context, transactionId string)
+	DepositPoints(c *gin.Context)
 	// Transfer between wallets
 	// (POST /secure/transfer)
 	TransferBalance(c *gin.Context)
-	// Get all user wallets
-	// (GET /secure/wallet)
-	ListUserWallets(c *gin.Context)
 	// Create a new wallet
 	// (POST /secure/wallet)
 	CreateWallet(c *gin.Context)
 	// Delete a wallet by ID
 	// (DELETE /secure/wallet/{walletId})
 	DeleteWallet(c *gin.Context, walletId string)
-	// Get wallet by ID
-	// (GET /secure/wallet/{walletId})
-	GetWalletById(c *gin.Context, walletId string)
 	// Update wallet by ID
 	// (PUT /secure/wallet/{walletId})
 	UpdateWallet(c *gin.Context, walletId string)
 	// List wallet transactions
 	// (GET /secure/wallet/{walletId}/transactions)
 	ListWalletTransactions(c *gin.Context, walletId string, params ListWalletTransactionsParams)
+	// Get all user wallets
+	// (GET /secure/wallets)
+	ListUserWallets(c *gin.Context)
 	// Withdraw from a wallet
 	// (POST /secure/withdraw)
-	WithdrawMoney(c *gin.Context)
+	WithdrawPoints(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -89,8 +80,8 @@ func (siw *ServerInterfaceWrapper) RegisterUser(c *gin.Context) {
 	siw.Handler.RegisterUser(c)
 }
 
-// DepositMoney operation middleware
-func (siw *ServerInterfaceWrapper) DepositMoney(c *gin.Context) {
+// DepositPoints operation middleware
+func (siw *ServerInterfaceWrapper) DepositPoints(c *gin.Context) {
 
 	c.Set(BearerAuthScopes, []string{})
 
@@ -101,59 +92,7 @@ func (siw *ServerInterfaceWrapper) DepositMoney(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DepositMoney(c)
-}
-
-// GetTransactionDetails operation middleware
-func (siw *ServerInterfaceWrapper) GetTransactionDetails(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "transactionId" -------------
-	var transactionId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "transactionId", c.Param("transactionId"), &transactionId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter transactionId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	c.Set(BearerAuthScopes, []string{})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetTransactionDetails(c, transactionId)
-}
-
-// UpdateTransactionDescription operation middleware
-func (siw *ServerInterfaceWrapper) UpdateTransactionDescription(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "transactionId" -------------
-	var transactionId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "transactionId", c.Param("transactionId"), &transactionId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter transactionId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	c.Set(BearerAuthScopes, []string{})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.UpdateTransactionDescription(c, transactionId)
+	siw.Handler.DepositPoints(c)
 }
 
 // TransferBalance operation middleware
@@ -169,21 +108,6 @@ func (siw *ServerInterfaceWrapper) TransferBalance(c *gin.Context) {
 	}
 
 	siw.Handler.TransferBalance(c)
-}
-
-// ListUserWallets operation middleware
-func (siw *ServerInterfaceWrapper) ListUserWallets(c *gin.Context) {
-
-	c.Set(BearerAuthScopes, []string{})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.ListUserWallets(c)
 }
 
 // CreateWallet operation middleware
@@ -225,32 +149,6 @@ func (siw *ServerInterfaceWrapper) DeleteWallet(c *gin.Context) {
 	}
 
 	siw.Handler.DeleteWallet(c, walletId)
-}
-
-// GetWalletById operation middleware
-func (siw *ServerInterfaceWrapper) GetWalletById(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "walletId" -------------
-	var walletId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "walletId", c.Param("walletId"), &walletId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter walletId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	c.Set(BearerAuthScopes, []string{})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetWalletById(c, walletId)
 }
 
 // UpdateWallet operation middleware
@@ -324,8 +222,8 @@ func (siw *ServerInterfaceWrapper) ListWalletTransactions(c *gin.Context) {
 	siw.Handler.ListWalletTransactions(c, walletId, params)
 }
 
-// WithdrawMoney operation middleware
-func (siw *ServerInterfaceWrapper) WithdrawMoney(c *gin.Context) {
+// ListUserWallets operation middleware
+func (siw *ServerInterfaceWrapper) ListUserWallets(c *gin.Context) {
 
 	c.Set(BearerAuthScopes, []string{})
 
@@ -336,7 +234,22 @@ func (siw *ServerInterfaceWrapper) WithdrawMoney(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.WithdrawMoney(c)
+	siw.Handler.ListUserWallets(c)
+}
+
+// WithdrawPoints operation middleware
+func (siw *ServerInterfaceWrapper) WithdrawPoints(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.WithdrawPoints(c)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -368,15 +281,12 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.POST(options.BaseURL+"/public/login", wrapper.LoginUser)
 	router.POST(options.BaseURL+"/public/register", wrapper.RegisterUser)
-	router.POST(options.BaseURL+"/secure/deposit", wrapper.DepositMoney)
-	router.GET(options.BaseURL+"/secure/transaction/:transactionId", wrapper.GetTransactionDetails)
-	router.PATCH(options.BaseURL+"/secure/transaction/:transactionId", wrapper.UpdateTransactionDescription)
+	router.POST(options.BaseURL+"/secure/deposit", wrapper.DepositPoints)
 	router.POST(options.BaseURL+"/secure/transfer", wrapper.TransferBalance)
-	router.GET(options.BaseURL+"/secure/wallet", wrapper.ListUserWallets)
 	router.POST(options.BaseURL+"/secure/wallet", wrapper.CreateWallet)
 	router.DELETE(options.BaseURL+"/secure/wallet/:walletId", wrapper.DeleteWallet)
-	router.GET(options.BaseURL+"/secure/wallet/:walletId", wrapper.GetWalletById)
 	router.PUT(options.BaseURL+"/secure/wallet/:walletId", wrapper.UpdateWallet)
 	router.GET(options.BaseURL+"/secure/wallet/:walletId/transactions", wrapper.ListWalletTransactions)
-	router.POST(options.BaseURL+"/secure/withdraw", wrapper.WithdrawMoney)
+	router.GET(options.BaseURL+"/secure/wallets", wrapper.ListUserWallets)
+	router.POST(options.BaseURL+"/secure/withdraw", wrapper.WithdrawPoints)
 }

@@ -13,10 +13,9 @@ const (
 
 // Defines values for TransactionResponseDataType.
 const (
-	Deposit     TransactionResponseDataType = "deposit"
-	TransferIn  TransactionResponseDataType = "transfer_in"
-	TransferOut TransactionResponseDataType = "transfer_out"
-	Withdraw    TransactionResponseDataType = "withdraw"
+	Deposit  TransactionResponseDataType = "deposit"
+	Transfer TransactionResponseDataType = "transfer"
+	Withdraw TransactionResponseDataType = "withdraw"
 )
 
 // DepositRequest defines model for DepositRequest.
@@ -82,11 +81,6 @@ type TransferRequest struct {
 	ToWalletId   string  `json:"toWalletId" validate:"required"`
 }
 
-// UpdateTransactionDescRequest defines model for UpdateTransactionDescRequest.
-type UpdateTransactionDescRequest struct {
-	Description *string `json:"description,omitempty"`
-}
-
 // WalletRequest defines model for WalletRequest.
 type WalletRequest struct {
 	Description *string `json:"description,omitempty"`
@@ -97,7 +91,7 @@ type WalletRequest struct {
 type WalletResponseData struct {
 	Balance     float64   `json:"balance"`
 	Description *string   `json:"description,omitempty"`
-	Id          int       `json:"id"`
+	Id          string    `json:"id"`
 	Name        string    `json:"name"`
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
@@ -128,11 +122,6 @@ type ListWalletTransactionsResponse struct {
 // LoginResponse defines model for LoginResponse.
 type LoginResponse = LoginResponseData
 
-// WalletInfoResponse defines model for WalletInfoResponse.
-type WalletInfoResponse struct {
-	Data *WalletResponseData `json:"data,omitempty"`
-}
-
 // ListWalletTransactionsParams defines parameters for ListWalletTransactions.
 type ListWalletTransactionsParams struct {
 	Page  *int `form:"page,omitempty" json:"page,omitempty"`
@@ -145,11 +134,8 @@ type LoginUserJSONRequestBody = LoginRequest
 // RegisterUserJSONRequestBody defines body for RegisterUser for application/json ContentType.
 type RegisterUserJSONRequestBody = RegisterRequest
 
-// DepositMoneyJSONRequestBody defines body for DepositMoney for application/json ContentType.
-type DepositMoneyJSONRequestBody = DepositRequest
-
-// UpdateTransactionDescriptionJSONRequestBody defines body for UpdateTransactionDescription for application/json ContentType.
-type UpdateTransactionDescriptionJSONRequestBody = UpdateTransactionDescRequest
+// DepositPointsJSONRequestBody defines body for DepositPoints for application/json ContentType.
+type DepositPointsJSONRequestBody = DepositRequest
 
 // TransferBalanceJSONRequestBody defines body for TransferBalance for application/json ContentType.
 type TransferBalanceJSONRequestBody = TransferRequest
@@ -160,5 +146,5 @@ type CreateWalletJSONRequestBody = WalletRequest
 // UpdateWalletJSONRequestBody defines body for UpdateWallet for application/json ContentType.
 type UpdateWalletJSONRequestBody = WalletRequest
 
-// WithdrawMoneyJSONRequestBody defines body for WithdrawMoney for application/json ContentType.
-type WithdrawMoneyJSONRequestBody = WithdrawRequest
+// WithdrawPointsJSONRequestBody defines body for WithdrawPoints for application/json ContentType.
+type WithdrawPointsJSONRequestBody = WithdrawRequest
