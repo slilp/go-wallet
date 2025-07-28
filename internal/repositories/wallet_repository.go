@@ -13,6 +13,7 @@ type WalletRepository interface {
 	UpdateInfo(id, name string, desc *string) error
 	Delete(walletId string) error
 	ListAll(userId string) ([]entity.Wallet, error)
+	QueryByIdAndUser(userId, walletId string) (*entity.Wallet, error)
 }
 
 type walletRepository struct {
@@ -57,4 +58,13 @@ func (r *walletRepository) ListAll(userId string) ([]entity.Wallet, error) {
 		return nil, err
 	}
 	return wallets, nil
+}
+
+func (r *walletRepository) QueryByIdAndUser(userId, walletId string) (*entity.Wallet, error) {
+	var wallet entity.Wallet
+	if err := r.db.Where(&entity.Wallet{UserID: userId, ID: walletId}).First(&wallet).Error; err != nil {
+		log.Printf("QueryByIdAndUser error: %v", err)
+		return nil, err
+	}
+	return &wallet, nil
 }

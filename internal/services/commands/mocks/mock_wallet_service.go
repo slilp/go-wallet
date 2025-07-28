@@ -69,15 +69,15 @@ func (mr *MockWalletServiceMockRecorder) HandleDelete(walletId any) *gomock.Call
 }
 
 // HandleUpdateInfo mocks base method.
-func (m *MockWalletService) HandleUpdateInfo(userId string, req api_gen.WalletRequest) error {
+func (m *MockWalletService) HandleUpdateInfo(walletId string, req api_gen.WalletRequest) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HandleUpdateInfo", userId, req)
+	ret := m.ctrl.Call(m, "HandleUpdateInfo", walletId, req)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // HandleUpdateInfo indicates an expected call of HandleUpdateInfo.
-func (mr *MockWalletServiceMockRecorder) HandleUpdateInfo(userId, req any) *gomock.Call {
+func (mr *MockWalletServiceMockRecorder) HandleUpdateInfo(walletId, req any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleUpdateInfo", reflect.TypeOf((*MockWalletService)(nil).HandleUpdateInfo), userId, req)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleUpdateInfo", reflect.TypeOf((*MockWalletService)(nil).HandleUpdateInfo), walletId, req)
 }

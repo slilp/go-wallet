@@ -80,7 +80,7 @@ func (suite *UtilsTestSuite) TestBindAndValidateRequestBody() {
 			name:           "ValidRequest",
 			body:           map[string]interface{}{"name": "John", "email": "john@example.com"},
 			expectSuccess:  true,
-			expectedStatus: 0, // no response written
+			expectedStatus: 0,
 		},
 		{
 			name:           "MissingName",

@@ -22,7 +22,6 @@ services:
       - ./:/app
     depends_on:
       - database
-      - redis
 
   database:
     image: postgres:latest
@@ -35,12 +34,3 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - 5432:5432
-
-  redis:
-    image: redis:latest
-    restart: unless-stopped
-    command: ["redis-server", "--requirepass", "password"]
-    ports:
-      - "6379:6379"
-    volumes:
-      - ./data/redis:/data

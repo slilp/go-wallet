@@ -83,6 +83,21 @@ func (mr *MockWalletRepositoryMockRecorder) ListAll(userId any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAll", reflect.TypeOf((*MockWalletRepository)(nil).ListAll), userId)
 }
 
+// QueryByIdAndUser mocks base method.
+func (m *MockWalletRepository) QueryByIdAndUser(userId, walletId string) (*entity.Wallet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryByIdAndUser", userId, walletId)
+	ret0, _ := ret[0].(*entity.Wallet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// QueryByIdAndUser indicates an expected call of QueryByIdAndUser.
+func (mr *MockWalletRepositoryMockRecorder) QueryByIdAndUser(userId, walletId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryByIdAndUser", reflect.TypeOf((*MockWalletRepository)(nil).QueryByIdAndUser), userId, walletId)
+}
+
 // UpdateInfo mocks base method.
 func (m *MockWalletRepository) UpdateInfo(id, name string, desc *string) error {
 	m.ctrl.T.Helper()

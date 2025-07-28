@@ -237,147 +237,84 @@ func (suite *WalletRepositoryTestSuite) TestUpdateInfo() {
 	}
 }
 
-// func (suite *WalletRepositoryTestSuite) TestUpdateTransferBalance() {
-// 	testCases := []struct {
-// 		name        string
-// 		mock        func(sqlmock.Sqlmock)
-// 		from        string
-// 		to          string
-// 		amount      float64
-// 		wantErr     bool
-// 		expectedErr string
-// 	}{
-// 		{
-// 			name: "GivenWallets_WhenUpdateBalanceSuccess_ThenSuccess",
-// 			mock: func(mock sqlmock.Sqlmock) {
-// 				mock.ExpectBegin()
-// 				mock.ExpectExec(`UPDATE "wallets"`).
-// 					WillReturnResult(sqlmock.NewResult(1, 1))
-// 				mock.ExpectExec(`UPDATE "wallets"`).
-// 					WillReturnResult(sqlmock.NewResult(1, 1))
-// 				mock.ExpectCommit()
-// 			},
-// 			from:        "<FromID>",
-// 			to:          "<ToID>",
-// 			amount:      50.0,
-// 			wantErr:     false,
-// 			expectedErr: "",
-// 		},
-// 		{
-// 			name: "GivenWallets_WhenUpdateBalanceFromFail_ThenError",
-// 			mock: func(mock sqlmock.Sqlmock) {
-// 				mock.ExpectBegin()
-// 				mock.ExpectExec(`UPDATE "wallets"`).
-// 					WillReturnError(errors.New("from update failed"))
-// 				mock.ExpectRollback()
-// 			},
-// 			from:        "<FromID>",
-// 			to:          "<ToID>",
-// 			amount:      50.0,
-// 			wantErr:     true,
-// 			expectedErr: "from update failed",
-// 		},
-// 		{
-// 			name: "GivenWallets_WhenUpdateBalanceToFail_ThenError",
-// 			mock: func(mock sqlmock.Sqlmock) {
-// 				mock.ExpectBegin()
-// 				mock.ExpectExec(`UPDATE "wallets"`).
-// 					WillReturnResult(sqlmock.NewResult(1, 1))
-// 				mock.ExpectExec(`UPDATE "wallets"`).
-// 					WillReturnError(errors.New("to update failed"))
-// 				mock.ExpectRollback()
-// 			},
-// 			from:        "<FromID>",
-// 			to:          "<ToID>",
-// 			amount:      50.0,
-// 			wantErr:     true,
-// 			expectedErr: "to update failed",
-// 		},
-// 	}
+func (suite *WalletRepositoryTestSuite) TestQueryByIdAndUser() {
+	testCases := []struct {
+		name        string
+		mock        func(sqlmock.Sqlmock)
+		userId      string
+		walletId    string
+		want        *entity.Wallet
+		wantErr     bool
+		expectedErr string
+	}{
+		{
+			name: "GivenWalletId_WhenFound_ThenReturnWallet",
+			mock: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"id", "user_id", "name", "balance", "created_at", "updated_at"}).
+					AddRow("<ID>", "<UserID>", "<Name>", 100, nil, nil)
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3`).
+					WithArgs("<ID>", "<UserID>", 1).
+					WillReturnRows(rows)
+			},
+			userId:   "<UserID>",
+			walletId: "<ID>",
+			want: &entity.Wallet{
+				ID:      "<ID>",
+				UserID:  "<UserID>",
+				Name:    "<Name>",
+				Balance: 100,
+			},
+			wantErr:     false,
+			expectedErr: "",
+		},
+		{
+			name: "GivenWalletId_WhenNotFound_ThenError",
+			mock: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"id", "user_id", "name", "balance", "created_at", "updated_at"})
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3`).
+					WithArgs("<ID>", "<UserID>", 1).
+					WillReturnRows(rows)
+			},
+			userId:      "<UserID>",
+			walletId:    "<ID>",
+			want:        nil,
+			wantErr:     true,
+			expectedErr: "record not found",
+		},
+		{
+			name: "GivenWalletId_WhenQueryFail_ThenError",
+			mock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3`).
+					WithArgs("<ID>", "<UserID>", 1).
+					WillReturnError(errors.New("query failed"))
+			},
+			userId:      "<UserID>",
+			walletId:    "<ID>",
+			want:        nil,
+			wantErr:     true,
+			expectedErr: "query failed",
+		},
+	}
 
-// 	for _, tc := range testCases {
-// 		suite.Run(tc.name, func() {
-// 			tc.mock(suite.sqlMock)
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			tc.mock(suite.sqlMock)
 
-// 			err := suite.walletRepo.UpdateTransferBalance(tc.from, tc.to, tc.amount)
+			result, err := suite.walletRepo.QueryByIdAndUser(tc.userId, tc.walletId)
 
-// 			if tc.wantErr {
-// 				suite.EqualError(err, tc.expectedErr)
-// 			} else {
-// 				suite.NoError(err)
-// 			}
+			if tc.wantErr {
+				suite.Nil(result)
+				suite.EqualError(err, tc.expectedErr)
+			} else {
+				suite.NoError(err)
+				suite.NotNil(result)
+				suite.Equal(tc.want.ID, result.ID)
+				suite.Equal(tc.want.UserID, result.UserID)
+				suite.Equal(tc.want.Name, result.Name)
+				suite.Equal(tc.want.Balance, result.Balance)
+			}
 
-// 			suite.sqlMock.ExpectationsWereMet()
-// 		})
-// 	}
-// }
-
-// func (suite *WalletRepositoryTestSuite) TestUpdateBalance() {
-// 	testCases := []struct {
-// 		name        string
-// 		mock        func(sqlmock.Sqlmock)
-// 		to          string
-// 		amount      float64
-// 		wantErr     bool
-// 		expectedErr string
-// 	}{
-// 		{
-// 			name: "GivenPositiveAmount_WhenUpdateBalanceSuccess_ThenSuccess",
-// 			mock: func(mock sqlmock.Sqlmock) {
-// 				mock.ExpectBegin()
-// 				mock.ExpectExec(`UPDATE "wallets"`).
-// 					WithArgs(sqlmock.AnyArg(), "<ToID>").
-// 					WillReturnResult(sqlmock.NewResult(1, 1))
-// 				mock.ExpectCommit()
-// 			},
-// 			to:          "<ToID>",
-// 			amount:      100.0,
-// 			wantErr:     false,
-// 			expectedErr: "",
-// 		},
-// 		{
-// 			name: "GivenNegativeAmount_WhenUpdateBalanceSuccess_ThenSuccess",
-// 			mock: func(mock sqlmock.Sqlmock) {
-// 				mock.ExpectBegin()
-// 				mock.ExpectExec(`UPDATE "wallets"`).
-// 					WithArgs(sqlmock.AnyArg(), "<ToID>").
-// 					WillReturnResult(sqlmock.NewResult(1, 1))
-// 				mock.ExpectCommit()
-// 			},
-// 			to:          "<ToID>",
-// 			amount:      -50.0,
-// 			wantErr:     false,
-// 			expectedErr: "",
-// 		},
-// 		{
-// 			name: "GivenAmount_WhenUpdateBalanceFails_ThenError",
-// 			mock: func(mock sqlmock.Sqlmock) {
-// 				mock.ExpectBegin()
-// 				mock.ExpectExec(`UPDATE "wallets"`).
-// 					WithArgs(sqlmock.AnyArg(), "<ToID>").
-// 					WillReturnError(errors.New("update balance failed"))
-// 				mock.ExpectRollback()
-// 			},
-// 			to:          "<ToID>",
-// 			amount:      10.0,
-// 			wantErr:     true,
-// 			expectedErr: "update balance failed",
-// 		},
-// 	}
-
-// 	for _, tc := range testCases {
-// 		suite.Run(tc.name, func() {
-// 			tc.mock(suite.sqlMock)
-
-// 			err := suite.walletRepo.UpdateBalance(tc.to, tc.amount)
-
-// 			if tc.wantErr {
-// 				suite.EqualError(err, tc.expectedErr)
-// 			} else {
-// 				suite.NoError(err)
-// 			}
-
-// 			suite.sqlMock.ExpectationsWereMet()
-// 		})
-// 	}
-// }
+			suite.sqlMock.ExpectationsWereMet()
+		})
+	}
+}

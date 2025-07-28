@@ -12,7 +12,7 @@ package mock_queries
 import (
 	reflect "reflect"
 
-	entity "github.com/slilp/go-wallet/internal/repositories/entity"
+	api_gen "github.com/slilp/go-wallet/internal/port/restapis/api_gen"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,10 +41,10 @@ func (m *MockLoginService) EXPECT() *MockLoginServiceMockRecorder {
 }
 
 // Handle mocks base method.
-func (m *MockLoginService) Handle(username, password string) (*entity.User, error) {
+func (m *MockLoginService) Handle(username, password string) (*api_gen.LoginResponseData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Handle", username, password)
-	ret0, _ := ret[0].(*entity.User)
+	ret0, _ := ret[0].(*api_gen.LoginResponseData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

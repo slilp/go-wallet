@@ -11,10 +11,13 @@ import (
 
 type QueriesTestSuite struct {
 	suite.Suite
-	loginService       queries.LoginService
-	listWalletsService queries.ListWalletsService
-	mockUserRepo       *mock_repositories.MockUserRepository
-	mockWalletRepo     *mock_repositories.MockWalletRepository
+	loginService            queries.LoginService
+	listWalletsService      queries.ListWalletsService
+	listTransactionsService queries.ListTransactionsService
+
+	mockUserRepo        *mock_repositories.MockUserRepository
+	mockWalletRepo      *mock_repositories.MockWalletRepository
+	mockTransactionRepo *mock_repositories.MockTransactionRepository
 }
 
 func (suite *QueriesTestSuite) SetupTest() {
@@ -22,11 +25,14 @@ func (suite *QueriesTestSuite) SetupTest() {
 
 	mockUserRepo := mock_repositories.NewMockUserRepository(ctrl)
 	mockWalletRepo := mock_repositories.NewMockWalletRepository(ctrl)
+	mockTransactionRepo := mock_repositories.NewMockTransactionRepository(ctrl)
 	suite.mockUserRepo = mockUserRepo
 	suite.mockWalletRepo = mockWalletRepo
+	suite.mockTransactionRepo = mockTransactionRepo
 
 	suite.loginService = queries.NewLoginService(mockUserRepo)
 	suite.listWalletsService = queries.NewListWalletsService(mockWalletRepo)
+	suite.listTransactionsService = queries.NewListTransactionsService(mockWalletRepo, mockTransactionRepo)
 }
 
 func TestQueriesTestSuite(t *testing.T) {

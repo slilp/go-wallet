@@ -40,6 +40,21 @@ func (m *MockTransactionRepository) EXPECT() *MockTransactionRepositoryMockRecor
 	return m.recorder
 }
 
+// CountByWalletId mocks base method.
+func (m *MockTransactionRepository) CountByWalletId(walletId string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountByWalletId", walletId)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountByWalletId indicates an expected call of CountByWalletId.
+func (mr *MockTransactionRepositoryMockRecorder) CountByWalletId(walletId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountByWalletId", reflect.TypeOf((*MockTransactionRepository)(nil).CountByWalletId), walletId)
+}
+
 // List mocks base method.
 func (m *MockTransactionRepository) List(walletId string, page, limit int) ([]entity.Transaction, error) {
 	m.ctrl.T.Helper()

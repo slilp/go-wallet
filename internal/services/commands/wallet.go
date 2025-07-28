@@ -10,7 +10,7 @@ import (
 type WalletService interface {
 	HandleCreate(userId string, req api_gen.WalletRequest) error
 	HandleDelete(walletId string) error
-	HandleUpdateInfo(userId string, req api_gen.WalletRequest) error
+	HandleUpdateInfo(walletId string, req api_gen.WalletRequest) error
 }
 
 type walletService struct {

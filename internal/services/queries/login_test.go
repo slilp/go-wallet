@@ -3,6 +3,7 @@ package queries_test
 import (
 	"errors"
 
+	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/repositories/entity"
 	mock_repositories "github.com/slilp/go-wallet/internal/repositories/mocks"
 	"golang.org/x/crypto/bcrypt"
@@ -13,7 +14,7 @@ func (suite *QueriesTestSuite) TestLoginService_Handle() {
 	testCases := []struct {
 		name        string
 		mock        func(*mock_repositories.MockUserRepository)
-		want        *entity.User
+		want        *api_gen.LoginResponseData
 		wantErr     bool
 		expectedErr string
 	}{
@@ -23,16 +24,17 @@ func (suite *QueriesTestSuite) TestLoginService_Handle() {
 				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("<Password>"), bcrypt.DefaultCost)
 
 				mockUserRepo.EXPECT().QueryByEmail("<Email>").Return(&entity.User{
+					ID:          "<UserID>",
 					Email:       "<Email>",
 					Password:    string(hashedPassword),
 					DisplayName: "<DisplayName>",
 				}, nil)
 
 			},
-			want: &entity.User{
+			want: &api_gen.LoginResponseData{
 				Email:       "<Email>",
-				Password:    "<Password>",
 				DisplayName: "<DisplayName>",
+				UserId:      "<UserID>",
 			},
 			wantErr:     false,
 			expectedErr: "",
@@ -75,9 +77,10 @@ func (suite *QueriesTestSuite) TestLoginService_Handle() {
 			} else {
 				suite.NoError(err)
 				suite.NotNil(result)
-				resultValue := *result
-				suite.Equal("<Email>", resultValue.Email)
-				suite.Equal("<DisplayName>", resultValue.DisplayName)
+				suite.Equal(tc.want.Email, result.Email)
+				suite.Equal(tc.want.DisplayName, result.DisplayName)
+				suite.Equal(tc.want.UserId, result.UserId)
+				suite.NotEmpty(result.AccessToken)
 			}
 		})
 	}

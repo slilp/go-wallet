@@ -3,8 +3,10 @@ package repositories
 import (
 	"log"
 
+	"github.com/slilp/go-wallet/internal/consts"
 	"github.com/slilp/go-wallet/internal/repositories/entity"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 //go:generate mockgen -source=./transaction_repository.go -destination=./mocks/mock_transaction_repository.go -package=mock_repositories
@@ -12,6 +14,7 @@ type TransactionRepository interface {
 	UpdateBalanceTransaction(walletId string, amount float64) error
 	UpdateTransferTransaction(from, to string, amount float64) error
 	List(walletId string, page, limit int) ([]entity.Transaction, error)
+	CountByWalletId(walletId string) (int64, error)
 }
 
 type transactionRepository struct {
@@ -33,6 +36,27 @@ func (r *transactionRepository) Create(req entity.Transaction) error {
 
 func (r *transactionRepository) UpdateTransferTransaction(from, to string, amount float64) error {
 	if err := r.db.Transaction(func(tx *gorm.DB) error {
+
+		var fromWallet entity.Wallet
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where(&entity.Wallet{ID: from}).
+			First(&fromWallet).Error; err != nil {
+			log.Printf("Failed to lock (from) wallet: %v", err)
+			return err
+		}
+
+		if fromWallet.Balance < amount {
+			log.Printf("Insufficient balance: wallet %s has %.2f, attempted %.2f", from, fromWallet.Balance, amount)
+			return consts.ErrInsufficientBalance
+		}
+
+		var toWallet entity.Wallet
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where(&entity.Wallet{ID: to}).
+			First(&toWallet).Error; err != nil {
+			log.Printf("Failed to lock (to) wallet: %v", err)
+			return err
+		}
 
 		if err := tx.Model(&entity.Wallet{}).
 			Where(&entity.Wallet{ID: from}).
@@ -68,6 +92,14 @@ func (r *transactionRepository) UpdateTransferTransaction(from, to string, amoun
 
 func (r *transactionRepository) UpdateBalanceTransaction(walletId string, amount float64) error {
 	if err := r.db.Transaction(func(tx *gorm.DB) error {
+
+		var lockWallet entity.Wallet
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where(&entity.Wallet{ID: walletId}).
+			First(&lockWallet).Error; err != nil {
+			log.Printf("Failed to lock wallet: %v", err)
+			return err
+		}
 
 		if err := tx.Model(&entity.Wallet{}).
 			Where(&entity.Wallet{ID: walletId}).
@@ -114,4 +146,15 @@ func (r *transactionRepository) List(walletId string, page, limit int) ([]entity
 	}
 
 	return transactions, nil
+}
+
+func (r *transactionRepository) CountByWalletId(walletId string) (int64, error) {
+	var count int64
+	if err := r.db.Model(&entity.Transaction{}).
+		Where("from = ? OR to = ?", walletId, walletId).
+		Count(&count).Error; err != nil {
+		log.Printf("Count transactions error: %v", err)
+		return 0, err
+	}
+	return count, nil
 }

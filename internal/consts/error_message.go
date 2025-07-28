@@ -3,5 +3,5 @@ package consts
 import "errors"
 
 var (
-	ErrorRecordNotFound = errors.New("record not found")
+	ErrInsufficientBalance = errors.New("insufficient balance")
 )

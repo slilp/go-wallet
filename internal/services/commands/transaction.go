@@ -4,7 +4,7 @@ import (
 	"github.com/slilp/go-wallet/internal/repositories"
 )
 
-//go:generate mockgen -source=./wallet.go -destination=./mocks/mock_wallet_service.go -package=mock_commands
+//go:generate mockgen -source=./transaction.go -destination=./mocks/mock_transaction_service.go -package=mock_commands
 type TransactionService interface {
 	HandleTransferBalance(from, to string, amount float64) error
 	HandleDepositWithDrawBalance(walletId string, amount float64) error

@@ -36,7 +36,6 @@ paths:
               $ref: "#/components/schemas/LoginRequest"
       responses:
         "200":
-          description: Successful login
           $ref: "#/components/responses/LoginResponse"
         default:
           $ref: "#/components/responses/ErrorResponse"
@@ -210,7 +209,10 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/LoginResponseData"
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/LoginResponseData"
     WalletInfoResponse:
       description: Get wallet information response
       content:
@@ -306,15 +308,6 @@ components:
           x-oapi-codegen-extra-tags:
             validate: required
         displayName:
-          type: string
-          x-oapi-codegen-extra-tags:
-            validate: required
-    RefreshTokenRequest:
-      type: object
-      required:
-        - refreshToken
-      properties:
-        refreshToken:
           type: string
           x-oapi-codegen-extra-tags:
             validate: required
@@ -430,11 +423,6 @@ components:
         createdAt:
           type: string
           format: date-time
-    UpdateTransactionDescRequest:
-      type: object
-      properties:
-        description:
-          type: string
     PageLimitResponseData:
       type: object
       required:

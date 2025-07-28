@@ -120,7 +120,9 @@ type ListWalletTransactionsResponse struct {
 }
 
 // LoginResponse defines model for LoginResponse.
-type LoginResponse = LoginResponseData
+type LoginResponse struct {
+	Data *LoginResponseData `json:"data,omitempty"`
+}
 
 // ListWalletTransactionsParams defines parameters for ListWalletTransactions.
 type ListWalletTransactionsParams struct {

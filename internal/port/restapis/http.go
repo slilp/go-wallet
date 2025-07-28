@@ -7,11 +7,11 @@ import (
 
 type HttpServer struct {
 	api_gen.ServerInterface
-	app *server.Application
+	App *server.Application
 }
 
 func NewHttpServer(app *server.Application) HttpServer {
 	return HttpServer{
-		app: app,
+		App: app,
 	}
 }

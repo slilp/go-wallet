@@ -18,9 +18,6 @@ type AppConfig struct {
 	DBUsername          string `mapstructure:"DB_USERNAME"`
 	DBPassword          string `mapstructure:"DB_PASSWORD"`
 	DBMode              string `mapstructure:"DB_MODE"`
-	RedisHost           string `mapstructure:"REDIS_HOST"`
-	RedisPort           string `mapstructure:"REDIS_PORT"`
-	RedisPassword       string `mapstructure:"REDIS_PASSWORD"`
 }
 
 func InitConfig() {
