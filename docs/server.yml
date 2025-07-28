@@ -1,0 +1,525 @@
+openapi: "3.0.0"
+info:
+  title: Wallet API server
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Development server
+paths:
+  /public/register:
+    post:
+      tags:
+        - Authentication
+      summary: User registration
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Successful registration
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+  /public/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Successful login
+          $ref: "#/components/responses/LoginResponse"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+  /secure/wallet:
+    post:
+      tags:
+        - Wallet
+      summary: Create a new wallet
+      operationId: createWallet
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalletRequest"
+      responses:
+        "201":
+          description: Wallet created successfully
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    get:
+      tags:
+        - Wallet
+      summary: Get all user wallets
+      operationId: listUserWallets
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/ListUserWalletsResponse"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+  /secure/wallet/{walletId}:
+    get:
+      tags:
+        - Wallet
+      summary: Get wallet by ID
+      operationId: getWalletById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: walletId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/WalletInfoResponse"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    put:
+      tags:
+        - Wallet
+      summary: Update wallet by ID
+      operationId: updateWallet
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: walletId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalletRequest"
+      responses:
+        "200":
+          description: Wallet updated successfully
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    delete:
+      tags:
+        - Wallet
+      summary: Delete a wallet by ID
+      operationId: deleteWallet
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: walletId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Wallet deleted successfully
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+  /secure/wallet/{walletId}/transactions:
+    get:
+      tags:
+        - Transactions
+      summary: List wallet transactions
+      operationId: listWalletTransactions
+      parameters:
+        - name: walletId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            description: The current page index (starting from 1).
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            description: The number of items per page.
+            default: 20
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/ListWalletTransactionsResponse"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+  /secure/transfer:
+    post:
+      tags:
+        - Transactions
+      summary: Transfer between wallets
+      operationId: transferBalance
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferRequest"
+      responses:
+        "200":
+          description: Transfer successful
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+  /secure/deposit:
+    post:
+      tags:
+        - Transactions
+      summary: Deposit into a wallet
+      operationId: depositMoney
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DepositRequest"
+      responses:
+        "200":
+          description: Deposit successful
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+  /secure/withdraw:
+    post:
+      tags:
+        - Transactions
+      summary: Withdraw from a wallet
+      operationId: withdrawMoney
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WithdrawRequest"
+      responses:
+        "200":
+          description: Withdrawal successful
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+  /secure/transaction/{transactionId}:
+    get:
+      tags:
+        - Transactions
+      summary: Get transaction by ID
+      operationId: getTransactionDetails
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Transaction details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/TransactionResponseData"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    patch:
+      tags:
+        - Transactions
+      summary: Update transaction description
+      operationId: updateTransactionDescription
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTransactionDescRequest"
+      responses:
+        "200":
+          description: Transaction updated successfully
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+components:
+  responses:
+    LoginResponse:
+      description: Login response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LoginResponseData"
+    WalletInfoResponse:
+      description: Get wallet information response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/components/schemas/WalletResponseData"
+    ListUserWalletsResponse:
+      description: List user wallet response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WalletResponseData"
+    ListWalletTransactionsResponse:
+      description: List wallet transactions response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransactionResponseData"
+              pagination:
+                $ref: "#/components/schemas/PageLimitResponseData"
+    ErrorResponse:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - errorCode
+              - errorMessage
+            properties:
+              errorCode:
+                type: string
+              errorMessage:
+                type: string
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        password:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+    LoginResponseData:
+      type: object
+      required:
+        - email
+        - accessToken
+        - userId
+        - displayName
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token
+        userId:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - displayName
+      properties:
+        email:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        password:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        displayName:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+    WalletResponseData:
+      type: object
+      required:
+        - id
+        - name
+        - balance
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        balance:
+          type: number
+          format: double
+        updatedAt:
+          type: string
+          format: date-time
+    WalletRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        description:
+          type: string
+    TransferRequest:
+      type: object
+      required:
+        - fromWalletId
+        - toWalletId
+        - amount
+      properties:
+        fromWalletId:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        toWalletId:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+          x-oapi-codegen-extra-tags:
+            validate: required
+    DepositRequest:
+      type: object
+      required:
+        - walletId
+        - amount
+      properties:
+        walletId:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+          x-oapi-codegen-extra-tags:
+            validate: required
+    WithdrawRequest:
+      type: object
+      required:
+        - walletId
+        - amount
+      properties:
+        walletId:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+          x-oapi-codegen-extra-tags:
+            validate: required
+    TransactionResponseData:
+      type: object
+      required:
+        - id
+        - type
+        - amount
+        - fromWalletId
+        - toWalletId
+        - createdAt
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [deposit, withdraw, transfer_in, transfer_out]
+          description: Transaction type
+        amount:
+          type: number
+          format: double
+        fromWalletId:
+          type: string
+        toWalletId:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    UpdateTransactionDescRequest:
+      type: object
+      properties:
+        description:
+          type: string
+    PageLimitResponseData:
+      type: object
+      required:
+        - page
+        - limit
+        - totalRecords
+      properties:
+        page:
+          type: integer
+          description: The current page index (starting from 1).
+        limit:
+          type: integer
+          description: The number of items per page.
+        totalRecords:
+          type: integer
+          description: The total number of records available.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
