@@ -13,15 +13,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/slilp/go-wallet/internal/config"
 	"github.com/slilp/go-wallet/internal/middleware"
-	"github.com/slilp/go-wallet/internal/restapis"
-	"github.com/slilp/go-wallet/internal/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/port/restapis"
+	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/server"
 )
 
 func main() {
 	config.InitConfig()
 
-	app := server.NewApiServer()
+	app := server.NewApplicationServer()
 	httpServer := restapis.NewHttpServer(app)
 
 	r := gin.Default()

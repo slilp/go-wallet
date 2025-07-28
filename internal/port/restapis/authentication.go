@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/slilp/go-wallet/internal/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
 )
 
 // (POST /public/register)

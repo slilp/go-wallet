@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/slilp/go-wallet/internal/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/utils"
 )
 

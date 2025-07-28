@@ -1,7 +1,7 @@
 package restapis
 
 import (
-	"github.com/slilp/go-wallet/internal/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/server"
 )
 

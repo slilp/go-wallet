@@ -30,7 +30,7 @@ type Utils struct {
 	Validate *validator.Validate
 }
 
-func NewApiServer() *Application {
+func NewApplicationServer() *Application {
 
 	db, err := initDatabase()
 	if err != nil {
