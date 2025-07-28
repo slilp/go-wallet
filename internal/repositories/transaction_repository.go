@@ -1,7 +1,10 @@
 package repositories
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
+	"time"
 
 	"github.com/slilp/go-wallet/internal/consts"
 	"github.com/slilp/go-wallet/internal/repositories/entity"
@@ -23,15 +26,6 @@ type transactionRepository struct {
 
 func NewTransactionRepository(db *gorm.DB) TransactionRepository {
 	return &transactionRepository{db: db}
-}
-
-func (r *transactionRepository) Create(req entity.Transaction) error {
-	if err := r.db.Create(&req).Error; err != nil {
-		log.Printf("Create transaction error: %v", err)
-		return err
-	}
-
-	return nil
 }
 
 func (r *transactionRepository) UpdateTransferTransaction(from, to string, amount float64) error {
@@ -73,6 +67,7 @@ func (r *transactionRepository) UpdateTransferTransaction(from, to string, amoun
 		}
 
 		txRecord := entity.Transaction{
+			ID:     generateTransactionId(),
 			From:   from,
 			To:     to,
 			Amount: amount,
@@ -109,6 +104,7 @@ func (r *transactionRepository) UpdateBalanceTransaction(walletId string, amount
 		}
 
 		txRecord := entity.Transaction{
+			ID:     generateTransactionId(),
 			To:     walletId,
 			Amount: amount,
 			Type:   "deposit",
@@ -157,4 +153,17 @@ func (r *transactionRepository) CountByWalletId(walletId string) (int64, error) 
 		return 0, err
 	}
 	return count, nil
+}
+
+func generateTransactionId() string {
+	unixTime := time.Now().Unix()
+
+	timePart := fmt.Sprintf("%010d", unixTime)
+
+	rand.Seed(time.Now().UnixNano())
+	randomPart := fmt.Sprintf("%07d", rand.Intn(10000000))
+
+	transactionID := fmt.Sprintf("TRN%s%s", timePart, randomPart)
+
+	return transactionID
 }

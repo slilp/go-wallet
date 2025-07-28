@@ -315,8 +315,8 @@ func (suite *TransactionRepositoryTestSuite) TestCountByWalletId() {
 		{
 			name: "GivenWalletId_WhenCountSuccess_ThenReturnCount",
 			mock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT COUNT\(\*\) FROM "transactions" WHERE "from_wallet_id" = \$1 OR "to_wallet_id" = \$1`).
-					WithArgs("<WalletID>").
+				mock.ExpectQuery(`SELECT count\(\*\) FROM "transactions" WHERE from = \$1 OR to = \$2`).
+					WithArgs("<WalletID>", "<WalletID>").
 					WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(5))
 			},
 			walletId:  "<WalletID>",
@@ -326,8 +326,8 @@ func (suite *TransactionRepositoryTestSuite) TestCountByWalletId() {
 		{
 			name: "GivenWalletId_WhenCountFail_ThenError",
 			mock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT COUNT\(\*\) FROM "transactions" WHERE "from_wallet_id" = \$1 OR "to_wallet_id" = \$1`).
-					WithArgs("<WalletID>").
+				mock.ExpectQuery(`SELECT count\(\*\) FROM "transactions" WHERE from = \$1 OR to = \$2`).
+					WithArgs("<WalletID>", "<WalletID>").
 					WillReturnError(errors.New("count error"))
 			},
 			walletId:    "<WalletID>",
