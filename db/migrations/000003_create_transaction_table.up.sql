@@ -1,7 +1,7 @@
 CREATE TABLE "transactions" (
     "id" VARCHAR(20) PRIMARY KEY,
-    "from" UUID NOT NULL,
-    "to" UUID NOT NULL,
+    "from" UUID,
+    "to" UUID,
     "amount" DECIMAL(20, 2) NOT NULL,
     "type" VARCHAR(20) NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT NOW(),

@@ -71,29 +71,29 @@ func (mr *MockTransactionRepositoryMockRecorder) List(walletId, page, limit any)
 }
 
 // UpdateBalanceTransaction mocks base method.
-func (m *MockTransactionRepository) UpdateBalanceTransaction(walletId string, amount float64) error {
+func (m *MockTransactionRepository) UpdateBalanceTransaction(userId, walletId string, amount float64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateBalanceTransaction", walletId, amount)
+	ret := m.ctrl.Call(m, "UpdateBalanceTransaction", userId, walletId, amount)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateBalanceTransaction indicates an expected call of UpdateBalanceTransaction.
-func (mr *MockTransactionRepositoryMockRecorder) UpdateBalanceTransaction(walletId, amount any) *gomock.Call {
+func (mr *MockTransactionRepositoryMockRecorder) UpdateBalanceTransaction(userId, walletId, amount any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBalanceTransaction", reflect.TypeOf((*MockTransactionRepository)(nil).UpdateBalanceTransaction), walletId, amount)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBalanceTransaction", reflect.TypeOf((*MockTransactionRepository)(nil).UpdateBalanceTransaction), userId, walletId, amount)
 }
 
 // UpdateTransferTransaction mocks base method.
-func (m *MockTransactionRepository) UpdateTransferTransaction(from, to string, amount float64) error {
+func (m *MockTransactionRepository) UpdateTransferTransaction(userId, from, to string, amount float64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateTransferTransaction", from, to, amount)
+	ret := m.ctrl.Call(m, "UpdateTransferTransaction", userId, from, to, amount)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateTransferTransaction indicates an expected call of UpdateTransferTransaction.
-func (mr *MockTransactionRepositoryMockRecorder) UpdateTransferTransaction(from, to, amount any) *gomock.Call {
+func (mr *MockTransactionRepositoryMockRecorder) UpdateTransferTransaction(userId, from, to, amount any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTransferTransaction", reflect.TypeOf((*MockTransactionRepository)(nil).UpdateTransferTransaction), from, to, amount)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTransferTransaction", reflect.TypeOf((*MockTransactionRepository)(nil).UpdateTransferTransaction), userId, from, to, amount)
 }

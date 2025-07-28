@@ -40,7 +40,9 @@ func (h *HttpServer) TransferBalance(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.App.Commands.TransactionService.HandleTransferBalance(req.FromWalletId, req.ToWalletId, req.Amount); err != nil {
+	userId := utils.GetMiddlewareUserId(ctx)
+
+	if err := h.App.Commands.TransactionService.HandleTransferBalance(userId, req.FromWalletId, req.ToWalletId, req.Amount); err != nil {
 		if errors.Is(err, consts.ErrInsufficientBalance) {
 			ctx.JSON(http.StatusBadRequest, api_gen.ErrorResponse{ErrorCode: "400", ErrorMessage: "Insufficient balance"})
 			return
@@ -60,7 +62,9 @@ func (h *HttpServer) DepositPoints(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.App.Commands.TransactionService.HandleDepositWithDrawBalance(req.WalletId, req.Amount); err != nil {
+	userId := utils.GetMiddlewareUserId(ctx)
+
+	if err := h.App.Commands.TransactionService.HandleDepositWithDrawBalance(userId, req.WalletId, req.Amount); err != nil {
 		ctx.JSON(http.StatusInternalServerError, api_gen.ErrorResponse{ErrorCode: "500", ErrorMessage: "Fail to deposit"})
 		return
 	}
@@ -75,7 +79,9 @@ func (h *HttpServer) WithdrawPoints(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.App.Commands.TransactionService.HandleDepositWithDrawBalance(req.WalletId, req.Amount); err != nil {
+	userId := utils.GetMiddlewareUserId(ctx)
+
+	if err := h.App.Commands.TransactionService.HandleDepositWithDrawBalance(userId, req.WalletId, -req.Amount); err != nil {
 		ctx.JSON(http.StatusInternalServerError, api_gen.ErrorResponse{ErrorCode: "500", ErrorMessage: "Fail to withdraw"})
 		return
 	}

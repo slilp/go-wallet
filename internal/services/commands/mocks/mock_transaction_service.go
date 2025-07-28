@@ -40,29 +40,29 @@ func (m *MockTransactionService) EXPECT() *MockTransactionServiceMockRecorder {
 }
 
 // HandleDepositWithDrawBalance mocks base method.
-func (m *MockTransactionService) HandleDepositWithDrawBalance(walletId string, amount float64) error {
+func (m *MockTransactionService) HandleDepositWithDrawBalance(userId, walletId string, amount float64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HandleDepositWithDrawBalance", walletId, amount)
+	ret := m.ctrl.Call(m, "HandleDepositWithDrawBalance", userId, walletId, amount)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // HandleDepositWithDrawBalance indicates an expected call of HandleDepositWithDrawBalance.
-func (mr *MockTransactionServiceMockRecorder) HandleDepositWithDrawBalance(walletId, amount any) *gomock.Call {
+func (mr *MockTransactionServiceMockRecorder) HandleDepositWithDrawBalance(userId, walletId, amount any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleDepositWithDrawBalance", reflect.TypeOf((*MockTransactionService)(nil).HandleDepositWithDrawBalance), walletId, amount)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleDepositWithDrawBalance", reflect.TypeOf((*MockTransactionService)(nil).HandleDepositWithDrawBalance), userId, walletId, amount)
 }
 
 // HandleTransferBalance mocks base method.
-func (m *MockTransactionService) HandleTransferBalance(from, to string, amount float64) error {
+func (m *MockTransactionService) HandleTransferBalance(userId, from, to string, amount float64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HandleTransferBalance", from, to, amount)
+	ret := m.ctrl.Call(m, "HandleTransferBalance", userId, from, to, amount)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // HandleTransferBalance indicates an expected call of HandleTransferBalance.
-func (mr *MockTransactionServiceMockRecorder) HandleTransferBalance(from, to, amount any) *gomock.Call {
+func (mr *MockTransactionServiceMockRecorder) HandleTransferBalance(userId, from, to, amount any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleTransferBalance", reflect.TypeOf((*MockTransactionService)(nil).HandleTransferBalance), from, to, amount)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleTransferBalance", reflect.TypeOf((*MockTransactionService)(nil).HandleTransferBalance), userId, from, to, amount)
 }

@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/aarondl/null/v9"
 	"github.com/slilp/go-wallet/internal/consts"
 	"github.com/slilp/go-wallet/internal/repositories/entity"
 	"gorm.io/gorm"
@@ -14,8 +15,8 @@ import (
 
 //go:generate mockgen -source=./transaction_repository.go -destination=./mocks/mock_transaction_repository.go -package=mock_repositories
 type TransactionRepository interface {
-	UpdateBalanceTransaction(walletId string, amount float64) error
-	UpdateTransferTransaction(from, to string, amount float64) error
+	UpdateBalanceTransaction(userId, walletId string, amount float64) error
+	UpdateTransferTransaction(userId, from, to string, amount float64) error
 	List(walletId string, page, limit int) ([]entity.Transaction, error)
 	CountByWalletId(walletId string) (int64, error)
 }
@@ -28,12 +29,12 @@ func NewTransactionRepository(db *gorm.DB) TransactionRepository {
 	return &transactionRepository{db: db}
 }
 
-func (r *transactionRepository) UpdateTransferTransaction(from, to string, amount float64) error {
+func (r *transactionRepository) UpdateTransferTransaction(userId, from, to string, amount float64) error {
 	if err := r.db.Transaction(func(tx *gorm.DB) error {
 
 		var fromWallet entity.Wallet
 		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-			Where(&entity.Wallet{ID: from}).
+			Where(&entity.Wallet{ID: from, UserID: userId}).
 			First(&fromWallet).Error; err != nil {
 			log.Printf("Failed to lock (from) wallet: %v", err)
 			return err
@@ -68,8 +69,8 @@ func (r *transactionRepository) UpdateTransferTransaction(from, to string, amoun
 
 		txRecord := entity.Transaction{
 			ID:     generateTransactionId(),
-			From:   from,
-			To:     to,
+			From:   null.StringFrom(from).Ptr(),
+			To:     null.StringFrom(to).Ptr(),
 			Amount: amount,
 			Type:   "transfer",
 		}
@@ -85,12 +86,11 @@ func (r *transactionRepository) UpdateTransferTransaction(from, to string, amoun
 	return nil
 }
 
-func (r *transactionRepository) UpdateBalanceTransaction(walletId string, amount float64) error {
+func (r *transactionRepository) UpdateBalanceTransaction(userId, walletId string, amount float64) error {
 	if err := r.db.Transaction(func(tx *gorm.DB) error {
-
 		var lockWallet entity.Wallet
 		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-			Where(&entity.Wallet{ID: walletId}).
+			Where(&entity.Wallet{ID: walletId, UserID: userId}).
 			First(&lockWallet).Error; err != nil {
 			log.Printf("Failed to lock wallet: %v", err)
 			return err
@@ -105,17 +105,15 @@ func (r *transactionRepository) UpdateBalanceTransaction(walletId string, amount
 
 		txRecord := entity.Transaction{
 			ID:     generateTransactionId(),
-			To:     walletId,
+			To:     null.StringFrom(walletId).Ptr(),
 			Amount: amount,
 			Type:   "deposit",
 		}
 
 		if amount < 0 {
-			txRecord = entity.Transaction{
-				From:   walletId,
-				Amount: amount,
-				Type:   "withdraw",
-			}
+			txRecord.To = nil
+			txRecord.From = null.StringFrom(walletId).Ptr()
+			txRecord.Type = "withdraw"
 		}
 
 		if err := tx.Create(&txRecord).Error; err != nil {
@@ -133,7 +131,7 @@ func (r *transactionRepository) List(walletId string, page, limit int) ([]entity
 	var transactions []entity.Transaction
 	offset := (page - 1) * limit
 
-	if err := r.db.Where("from = ? OR to = ?", walletId, walletId).
+	if err := r.db.Where(`"from" = ? OR "to" = ?`, walletId, walletId).
 		Offset(offset).Limit(limit).
 		Order("created_at DESC").
 		Find(&transactions).Error; err != nil {
@@ -147,7 +145,7 @@ func (r *transactionRepository) List(walletId string, page, limit int) ([]entity
 func (r *transactionRepository) CountByWalletId(walletId string) (int64, error) {
 	var count int64
 	if err := r.db.Model(&entity.Transaction{}).
-		Where("from = ? OR to = ?", walletId, walletId).
+		Where(`"from" = ? OR "to" = ?`, walletId, walletId).
 		Count(&count).Error; err != nil {
 		log.Printf("Count transactions error: %v", err)
 		return 0, err

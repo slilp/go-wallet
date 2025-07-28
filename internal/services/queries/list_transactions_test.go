@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/aarondl/null/v9"
 	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/repositories/entity"
 	"gorm.io/gorm"
@@ -44,8 +45,8 @@ func (suite *QueriesTestSuite) TestListTransactionsService_Handle() {
 				transactions := []entity.Transaction{
 					{
 						ID:        "<TransactionID>",
-						From:      "<FromWalletID>",
-						To:        "<ToWalletID>",
+						From:      null.StringFrom("<FromWalletID>").Ptr(),
+						To:        null.StringFrom("<ToWalletID>").Ptr(),
 						Amount:    100,
 						Type:      "transfer",
 						CreatedAt: time.Now(),

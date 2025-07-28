@@ -19,8 +19,8 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateBalanceTransaction() {
 			name: "GivenPositiveAmount_WhenUpdateBalanceSuccess_ThenSuccess",
 			mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
-					WithArgs("<WalletID>", 1).
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3 FOR UPDATE`).
+					WithArgs("<WalletID>", "<UserID>", 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "balance"}).AddRow("<WalletID>", 100.0))
 				mock.ExpectExec(`UPDATE "wallets"`).
 					WithArgs(sqlmock.AnyArg(), "<WalletID>").
@@ -39,8 +39,8 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateBalanceTransaction() {
 			name: "GivenNegativeAmount_WhenUpdateBalanceSuccess_ThenSuccess",
 			mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
-					WithArgs("<WalletID>", 1).
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3 FOR UPDATE`).
+					WithArgs("<WalletID>", "<UserID>", 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "balance"}).AddRow("<WalletID>", 100.0))
 				mock.ExpectExec(`UPDATE "wallets"`).
 					WithArgs(sqlmock.AnyArg(), "<WalletID>").
@@ -59,8 +59,8 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateBalanceTransaction() {
 			name: "GivenAmount_WhenUpdateBalanceFail_ThenError",
 			mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
-					WithArgs("<WalletID>", 1).
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3 FOR UPDATE`).
+					WithArgs("<WalletID>", "<UserID>", 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "balance"}).AddRow("<WalletID>", 100.0))
 				mock.ExpectExec(`UPDATE "wallets"`).
 					WithArgs(sqlmock.AnyArg(), "<WalletID>").
@@ -76,8 +76,8 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateBalanceTransaction() {
 			name: "GivenAmount_WhenCreateTransactionFail_ThenError",
 			mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
-					WithArgs("<WalletID>", 1).
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3 FOR UPDATE`).
+					WithArgs("<WalletID>", "<UserID>", 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "balance"}).AddRow("<WalletID>", 100.0))
 				mock.ExpectExec(`UPDATE "wallets"`).
 					WithArgs(sqlmock.AnyArg(), "<WalletID>").
@@ -96,7 +96,8 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateBalanceTransaction() {
 	for _, tc := range testCases {
 		suite.Run(tc.name, func() {
 			tc.mock(suite.sqlMock)
-			err := suite.transactionRepo.UpdateBalanceTransaction(tc.walletId, tc.amount)
+			err := suite.transactionRepo.UpdateBalanceTransaction(
+				"<UserID>", tc.walletId, tc.amount)
 			if tc.wantErr {
 				suite.EqualError(err, tc.expectedErr)
 			} else {
@@ -121,8 +122,8 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateTransferTransaction() {
 			name: "GivenWallets_WhenUpdateTransferSuccess_ThenSuccess",
 			mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
-					WithArgs("<FromWalletID>", 1).
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3 FOR UPDATE`).
+					WithArgs("<FromWalletID>", "<UserID>", 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "balance"}).AddRow("<FromWalletID>", 100.0))
 				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
 					WithArgs("<ToWalletID>", 1).
@@ -148,8 +149,8 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateTransferTransaction() {
 			name: "GivenWallets_WhenInsufficientBalance_ThenError",
 			mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
-					WithArgs("<FromWalletID>", 1).
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3 FOR UPDATE`).
+					WithArgs("<FromWalletID>", "<UserID>", 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "balance"}).AddRow("<FromWalletID>", 10.0))
 				mock.ExpectRollback()
 			},
@@ -163,8 +164,8 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateTransferTransaction() {
 			name: "GivenWallets_WhenUpdateTransferFromFail_ThenError",
 			mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
-					WithArgs("<FromWalletID>", 1).
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3 FOR UPDATE`).
+					WithArgs("<FromWalletID>", "<UserID>", 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "balance"}).AddRow("<FromWalletID>", 100.0))
 				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
 					WithArgs("<ToWalletID>", 1).
@@ -184,8 +185,8 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateTransferTransaction() {
 			name: "GivenWallets_WhenUpdateTransferToFail_ThenError",
 			mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
-					WithArgs("<FromWalletID>", 1).
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3 FOR UPDATE`).
+					WithArgs("<FromWalletID>", "<UserID>", 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "balance"}).AddRow("<FromWalletID>", 100.0))
 				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
 					WithArgs("<ToWalletID>", 1).
@@ -208,8 +209,8 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateTransferTransaction() {
 			name: "GivenWallets_WhenCreateTransactionFail_ThenError",
 			mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
-					WithArgs("<FromWalletID>", 1).
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3 FOR UPDATE`).
+					WithArgs("<FromWalletID>", "<UserID>", 1).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "balance"}).AddRow("<FromWalletID>", 100.0))
 				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 ORDER BY "wallets"\."id" LIMIT \$2 FOR UPDATE`).
 					WithArgs("<ToWalletID>", 1).
@@ -235,7 +236,7 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateTransferTransaction() {
 	for _, tc := range testCases {
 		suite.Run(tc.name, func() {
 			tc.mock(suite.sqlMock)
-			err := suite.transactionRepo.UpdateTransferTransaction(tc.from, tc.to, tc.amount)
+			err := suite.transactionRepo.UpdateTransferTransaction("<UserID>", tc.from, tc.to, tc.amount)
 			if tc.wantErr {
 				suite.EqualError(err, tc.expectedErr)
 			} else {
@@ -315,7 +316,7 @@ func (suite *TransactionRepositoryTestSuite) TestCountByWalletId() {
 		{
 			name: "GivenWalletId_WhenCountSuccess_ThenReturnCount",
 			mock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "transactions" WHERE from = \$1 OR to = \$2`).
+				mock.ExpectQuery(`SELECT count\(\*\) FROM "transactions" WHERE "from" = \$1 OR "to" = \$2`).
 					WithArgs("<WalletID>", "<WalletID>").
 					WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(5))
 			},
@@ -326,7 +327,7 @@ func (suite *TransactionRepositoryTestSuite) TestCountByWalletId() {
 		{
 			name: "GivenWalletId_WhenCountFail_ThenError",
 			mock: func(mock sqlmock.Sqlmock) {
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "transactions" WHERE from = \$1 OR to = \$2`).
+				mock.ExpectQuery(`SELECT count\(\*\) FROM "transactions" WHERE "from" = \$1 OR "to" = \$2`).
 					WithArgs("<WalletID>", "<WalletID>").
 					WillReturnError(errors.New("count error"))
 			},

@@ -360,9 +360,8 @@ components:
         amount:
           type: number
           format: double
-          minimum: 0.01
           x-oapi-codegen-extra-tags:
-            validate: required
+            validate: required,min=0.01
     DepositRequest:
       type: object
       required:
@@ -376,9 +375,8 @@ components:
         amount:
           type: number
           format: double
-          minimum: 0.01
           x-oapi-codegen-extra-tags:
-            validate: required
+           validate: required,min=0.01    
     WithdrawRequest:
       type: object
       required:
@@ -392,9 +390,8 @@ components:
         amount:
           type: number
           format: double
-          minimum: 0.01
           x-oapi-codegen-extra-tags:
-            validate: required
+           validate: required,min=0.01
     TransactionResponseData:
       type: object
       required:

@@ -6,8 +6,8 @@ import (
 
 //go:generate mockgen -source=./transaction.go -destination=./mocks/mock_transaction_service.go -package=mock_commands
 type TransactionService interface {
-	HandleTransferBalance(from, to string, amount float64) error
-	HandleDepositWithDrawBalance(walletId string, amount float64) error
+	HandleTransferBalance(userId, from, to string, amount float64) error
+	HandleDepositWithDrawBalance(userId, walletId string, amount float64) error
 }
 
 type transactionService struct {
@@ -18,10 +18,10 @@ func NewTransactionService(transactionRepo repositories.TransactionRepository) T
 	return &transactionService{transactionRepo: transactionRepo}
 }
 
-func (r *transactionService) HandleTransferBalance(from, to string, amount float64) error {
-	return r.transactionRepo.UpdateTransferTransaction(from, to, amount)
+func (r *transactionService) HandleTransferBalance(userId, from, to string, amount float64) error {
+	return r.transactionRepo.UpdateTransferTransaction(userId, from, to, amount)
 }
 
-func (r *transactionService) HandleDepositWithDrawBalance(walletId string, amount float64) error {
-	return r.transactionRepo.UpdateBalanceTransaction(walletId, amount)
+func (r *transactionService) HandleDepositWithDrawBalance(userId, walletId string, amount float64) error {
+	return r.transactionRepo.UpdateBalanceTransaction(userId, walletId, amount)
 }

@@ -65,8 +65,9 @@ func NewApplicationServer() *Application {
 			LoginService:            queries.NewLoginService(userRepo),
 		},
 		Commands: Commands{
-			RegisterService: commands.NewRegisterService(userRepo),
-			WalletService:   commands.NewWalletService(walletRepo),
+			RegisterService:    commands.NewRegisterService(userRepo),
+			WalletService:      commands.NewWalletService(walletRepo),
+			TransactionService: commands.NewTransactionService(transactionRepo),
 		},
 		Utils: Utils{
 			Validate: validator.New(),

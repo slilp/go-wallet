@@ -30,7 +30,7 @@ func (suite *RestApisTestSuite) TestTransferBalance() {
 			},
 			mock: func() {
 				suite.mockTransactionService.EXPECT().
-					HandleTransferBalance("<Wallet1>", "<Wallet2>", float64(100)).
+					HandleTransferBalance("<UserID>", "<Wallet1>", "<Wallet2>", float64(100)).
 					Return(nil)
 			},
 			wantStatus: http.StatusOK,
@@ -45,7 +45,7 @@ func (suite *RestApisTestSuite) TestTransferBalance() {
 			},
 			mock: func() {
 				suite.mockTransactionService.EXPECT().
-					HandleTransferBalance("<Wallet1>", "<Wallet2>", float64(100)).
+					HandleTransferBalance("<UserID>", "<Wallet1>", "<Wallet2>", float64(100)).
 					Return(consts.ErrInsufficientBalance)
 			},
 			wantStatus:  http.StatusBadRequest,
@@ -61,7 +61,7 @@ func (suite *RestApisTestSuite) TestTransferBalance() {
 			},
 			mock: func() {
 				suite.mockTransactionService.EXPECT().
-					HandleTransferBalance("<Wallet1>", "<Wallet2>", float64(100)).
+					HandleTransferBalance("<UserID>", "<Wallet1>", "<Wallet2>", float64(100)).
 					Return(errors.New("some error"))
 			},
 			wantStatus:  http.StatusInternalServerError,
@@ -106,7 +106,7 @@ func (suite *RestApisTestSuite) TestDepositPoints() {
 			},
 			mock: func() {
 				suite.mockTransactionService.EXPECT().
-					HandleDepositWithDrawBalance("<Wallet1>", float64(100)).
+					HandleDepositWithDrawBalance("<UserID>", "<Wallet1>", float64(100)).
 					Return(nil)
 			},
 			wantStatus: http.StatusOK,
@@ -120,7 +120,7 @@ func (suite *RestApisTestSuite) TestDepositPoints() {
 			},
 			mock: func() {
 				suite.mockTransactionService.EXPECT().
-					HandleDepositWithDrawBalance("<Wallet1>", float64(100)).
+					HandleDepositWithDrawBalance("<UserID>", "<Wallet1>", float64(100)).
 					Return(errors.New("fail"))
 			},
 			wantStatus:  http.StatusInternalServerError,
@@ -165,7 +165,7 @@ func (suite *RestApisTestSuite) TestWithdrawPoints() {
 			},
 			mock: func() {
 				suite.mockTransactionService.EXPECT().
-					HandleDepositWithDrawBalance("<Wallet1>", float64(100)).
+					HandleDepositWithDrawBalance("<UserID>", "<Wallet1>", float64(-100)).
 					Return(nil)
 			},
 			wantStatus: http.StatusOK,
@@ -179,7 +179,7 @@ func (suite *RestApisTestSuite) TestWithdrawPoints() {
 			},
 			mock: func() {
 				suite.mockTransactionService.EXPECT().
-					HandleDepositWithDrawBalance("<Wallet1>", float64(100)).
+					HandleDepositWithDrawBalance("<UserID>", "<Wallet1>", float64(-100)).
 					Return(errors.New("fail"))
 			},
 			wantStatus:  http.StatusInternalServerError,

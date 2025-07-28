@@ -20,7 +20,7 @@ const (
 
 // DepositRequest defines model for DepositRequest.
 type DepositRequest struct {
-	Amount   float64 `json:"amount" validate:"required"`
+	Amount   float64 `json:"amount" validate:"required,min=0.01"`
 	WalletId string  `json:"walletId" validate:"required"`
 }
 
@@ -76,7 +76,7 @@ type TransactionResponseDataType string
 
 // TransferRequest defines model for TransferRequest.
 type TransferRequest struct {
-	Amount       float64 `json:"amount" validate:"required"`
+	Amount       float64 `json:"amount" validate:"required,min=0.01"`
 	FromWalletId string  `json:"fromWalletId" validate:"required"`
 	ToWalletId   string  `json:"toWalletId" validate:"required"`
 }
@@ -98,7 +98,7 @@ type WalletResponseData struct {
 
 // WithdrawRequest defines model for WithdrawRequest.
 type WithdrawRequest struct {
-	Amount   float64 `json:"amount" validate:"required"`
+	Amount   float64 `json:"amount" validate:"required,min=0.01"`
 	WalletId string  `json:"walletId" validate:"required"`
 }
 

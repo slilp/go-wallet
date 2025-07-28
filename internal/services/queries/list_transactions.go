@@ -1,6 +1,7 @@
 package queries
 
 import (
+	"github.com/aarondl/null/v9"
 	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/repositories"
 )
@@ -45,8 +46,8 @@ func (s *listTransactionsService) Handle(userId, walletId string, page, limit in
 	for _, tx := range transactions {
 		result = append(result, api_gen.TransactionResponseData{
 			Id:           tx.ID,
-			FromWalletId: tx.From,
-			ToWalletId:   tx.To,
+			FromWalletId: null.StringFromPtr(tx.From).String,
+			ToWalletId:   null.StringFromPtr(tx.To).String,
 			Amount:       tx.Amount,
 			Type:         api_gen.TransactionResponseDataType(tx.Type),
 			CreatedAt:    tx.CreatedAt,

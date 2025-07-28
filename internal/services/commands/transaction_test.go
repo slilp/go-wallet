@@ -20,7 +20,7 @@ func (suite *CommandsTestSuite) TestTransactionService_HandleTransferBalance() {
 			to:     "<ToWalletID>",
 			amount: 100.0,
 			mock: func() {
-				suite.mockTransactionRepo.EXPECT().UpdateTransferTransaction("<FromWalletID>", "<ToWalletID>", 100.0).Return(nil)
+				suite.mockTransactionRepo.EXPECT().UpdateTransferTransaction("<UserID>", "<FromWalletID>", "<ToWalletID>", 100.0).Return(nil)
 			},
 			wantErr:     false,
 			expectedErr: "",
@@ -31,7 +31,7 @@ func (suite *CommandsTestSuite) TestTransactionService_HandleTransferBalance() {
 			to:     "<ToWalletID>",
 			amount: 100.0,
 			mock: func() {
-				suite.mockTransactionRepo.EXPECT().UpdateTransferTransaction("<FromWalletID>", "<ToWalletID>", 100.0).Return(errors.New("update balance error"))
+				suite.mockTransactionRepo.EXPECT().UpdateTransferTransaction("<UserID>", "<FromWalletID>", "<ToWalletID>", 100.0).Return(errors.New("update balance error"))
 			},
 			wantErr:     true,
 			expectedErr: "update balance error",
@@ -41,7 +41,7 @@ func (suite *CommandsTestSuite) TestTransactionService_HandleTransferBalance() {
 	for _, tc := range testCases {
 		suite.Run(tc.name, func() {
 			tc.mock()
-			err := suite.transactionService.HandleTransferBalance(tc.from, tc.to, tc.amount)
+			err := suite.transactionService.HandleTransferBalance("<UserID>", tc.from, tc.to, tc.amount)
 			if tc.wantErr {
 				suite.EqualError(err, tc.expectedErr)
 			} else {
@@ -66,7 +66,7 @@ func (suite *CommandsTestSuite) TestWalletService_HandleDepositWithDrawBalance()
 			walletId: "<WalletID>",
 			amount:   100.0,
 			mock: func() {
-				suite.mockTransactionRepo.EXPECT().UpdateBalanceTransaction("<WalletID>", 100.0).Return(nil)
+				suite.mockTransactionRepo.EXPECT().UpdateBalanceTransaction("<UserID>", "<WalletID>", 100.0).Return(nil)
 			},
 			wantErr:     false,
 			expectedErr: "",
@@ -76,7 +76,7 @@ func (suite *CommandsTestSuite) TestWalletService_HandleDepositWithDrawBalance()
 			walletId: "<WalletID>",
 			amount:   -50.0,
 			mock: func() {
-				suite.mockTransactionRepo.EXPECT().UpdateBalanceTransaction("<WalletID>", -50.0).Return(nil)
+				suite.mockTransactionRepo.EXPECT().UpdateBalanceTransaction("<UserID>", "<WalletID>", -50.0).Return(nil)
 			},
 			wantErr:     false,
 			expectedErr: "",
@@ -86,7 +86,7 @@ func (suite *CommandsTestSuite) TestWalletService_HandleDepositWithDrawBalance()
 			walletId: "<WalletID>",
 			amount:   10.0,
 			mock: func() {
-				suite.mockTransactionRepo.EXPECT().UpdateBalanceTransaction("<WalletID>", 10.0).Return(errors.New("update balance error"))
+				suite.mockTransactionRepo.EXPECT().UpdateBalanceTransaction("<UserID>", "<WalletID>", 10.0).Return(errors.New("update balance error"))
 			},
 			wantErr:     true,
 			expectedErr: "update balance error",
@@ -96,7 +96,7 @@ func (suite *CommandsTestSuite) TestWalletService_HandleDepositWithDrawBalance()
 	for _, tc := range testCases {
 		suite.Run(tc.name, func() {
 			tc.mock()
-			err := suite.transactionService.HandleDepositWithDrawBalance(tc.walletId, tc.amount)
+			err := suite.transactionService.HandleDepositWithDrawBalance("<UserID>", tc.walletId, tc.amount)
 			if tc.wantErr {
 				suite.EqualError(err, tc.expectedErr)
 			} else {
