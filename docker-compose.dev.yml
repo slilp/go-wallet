@@ -13,9 +13,6 @@ services:
       DB_PASSWORD: password
       SECRET_TOKEN_KEY: MY_SECRET_TOKEN_KEY
       ACCESS_TOKEN_DURATION: 200
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: password
     ports:
       - "8080:8080"
     volumes:
