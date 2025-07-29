@@ -103,6 +103,11 @@ func (h *HttpServer) WithdrawPoints(ctx *gin.Context) {
 	userId := utils.GetMiddlewareUserId(ctx)
 
 	if err := h.App.Commands.TransactionService.HandleDepositWithDrawBalance(userId, req.WalletId, -req.Amount); err != nil {
+		if errors.Is(err, consts.ErrInsufficientBalance) {
+			ctx.JSON(http.StatusBadRequest, api_gen.ErrorResponse{ErrorCode: "400", ErrorMessage: "Insufficient balance"})
+			return
+		}
+
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, api_gen.ErrorResponse{ErrorCode: "404", ErrorMessage: "Wallet not found"})
 			return

@@ -56,6 +56,20 @@ func (suite *TransactionRepositoryTestSuite) TestUpdateBalanceTransaction() {
 			expectedErr: "",
 		},
 		{
+			name: "GivenOverAmount_WhenInsufficientBalance_ThenError",
+			mock: func(mock sqlmock.Sqlmock) {
+				mock.ExpectBegin()
+				mock.ExpectQuery(`SELECT \* FROM "wallets" WHERE "wallets"\."id" = \$1 AND "wallets"\."user_id" = \$2 ORDER BY "wallets"\."id" LIMIT \$3 FOR UPDATE`).
+					WithArgs("<WalletID>", "<UserID>", 1).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "balance"}).AddRow("<WalletID>", 100.0))
+				mock.ExpectRollback()
+			},
+			walletId:    "<WalletID>",
+			amount:      -101,
+			wantErr:     true,
+			expectedErr: "insufficient balance",
+		},
+		{
 			name: "GivenAmount_WhenUpdateBalanceFail_ThenError",
 			mock: func(mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()

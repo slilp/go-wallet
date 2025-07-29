@@ -96,13 +96,6 @@ func (r *transactionRepository) UpdateBalanceTransaction(userId, walletId string
 			return err
 		}
 
-		if err := tx.Model(&entity.Wallet{}).
-			Where(&entity.Wallet{ID: walletId}).
-			UpdateColumn("balance", gorm.Expr("balance + ?", amount)).Error; err != nil {
-			log.Printf("UpdateBalance error: %v", err)
-			return err
-		}
-
 		txRecord := entity.Transaction{
 			ID:     generateTransactionId(),
 			To:     null.StringFrom(walletId).Ptr(),
@@ -111,9 +104,21 @@ func (r *transactionRepository) UpdateBalanceTransaction(userId, walletId string
 		}
 
 		if amount < 0 {
+			if lockWallet.Balance < -amount {
+				log.Printf("Insufficient balance: wallet %s has %.2f, attempted %.2f", walletId, lockWallet.Balance, amount)
+				return consts.ErrInsufficientBalance
+			}
+
 			txRecord.To = nil
 			txRecord.From = null.StringFrom(walletId).Ptr()
 			txRecord.Type = "withdraw"
+		}
+
+		if err := tx.Model(&entity.Wallet{}).
+			Where(&entity.Wallet{ID: walletId}).
+			UpdateColumn("balance", gorm.Expr("balance + ?", amount)).Error; err != nil {
+			log.Printf("UpdateBalance error: %v", err)
+			return err
 		}
 
 		if err := tx.Create(&txRecord).Error; err != nil {

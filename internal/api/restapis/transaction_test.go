@@ -217,6 +217,21 @@ func (suite *RestApisTestSuite) TestWithdrawPoints() {
 			wantErr:    false,
 		},
 		{
+			name: "GivingInvalidRequest_WhenInsufficientBalance_ThenReturnBadRequest",
+			reqBody: api_gen.WithdrawRequest{
+				WalletId: "<Wallet1>",
+				Amount:   100,
+			},
+			mock: func() {
+				suite.mockTransactionService.EXPECT().
+					HandleDepositWithDrawBalance("<UserID>", "<Wallet1>", float64(-100)).
+					Return(consts.ErrInsufficientBalance)
+			},
+			wantStatus:  http.StatusBadRequest,
+			wantErr:     true,
+			expectedErr: "Insufficient balance",
+		},
+		{
 			name: "GivingInvalidRequest_WhenNotFound_ThenReturnNotFound",
 			reqBody: api_gen.WithdrawRequest{
 				WalletId: "<Wallet1>",
