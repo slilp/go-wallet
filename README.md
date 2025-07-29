@@ -18,6 +18,16 @@ It allows users to register, log in, create and manage multiple wallets, and per
 
 4. The API will be available at [http://localhost:8080/healthz](http://localhost:8080/healthz).
 
+## Run Unit Tests
+
+To run all unit tests, use:
+
+```sh
+make test
+# or
+go test -v ./...
+```
+
 ## API Spec
 
 You can get the OpenAPI spec at `docs/server.yml` to import into your Postman or API client.
