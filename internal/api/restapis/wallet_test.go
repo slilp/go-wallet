@@ -9,8 +9,9 @@ import (
 	"strconv"
 
 	"github.com/aarondl/null/v9"
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"go.uber.org/mock/gomock"
+	"gorm.io/gorm"
 )
 
 func (suite *RestApisTestSuite) TestCreateWallet() {
@@ -157,6 +158,7 @@ func (suite *RestApisTestSuite) TestListUserWallets() {
 func (suite *RestApisTestSuite) TestUpdateWallet() {
 	tests := []struct {
 		name           string
+		userId         string
 		walletId       string
 		requestBody    interface{}
 		mock           func()
@@ -165,6 +167,7 @@ func (suite *RestApisTestSuite) TestUpdateWallet() {
 	}{
 		{
 			name:     "GivingValidRequest_WhenUpdateWalletSuccess_ThenReturnOk",
+			userId:   "<UserID>",
 			walletId: "<WalletID>",
 			requestBody: api_gen.WalletRequest{
 				Name:        "Updated Wallet",
@@ -172,13 +175,14 @@ func (suite *RestApisTestSuite) TestUpdateWallet() {
 			},
 			mock: func() {
 				suite.mockWalletService.EXPECT().
-					HandleUpdateInfo("<WalletID>", gomock.Any()).
+					HandleUpdateInfo("<UserID>", "<WalletID>", gomock.Any()).
 					Return(nil)
 			},
 			expectedStatus: http.StatusOK,
 		},
 		{
 			name:     "GivingInvalidRequest_WhenUpdateWallet_ThenReturnBadRequest",
+			userId:   "<UserID>",
 			walletId: "<WalletID>",
 			requestBody: map[string]interface{}{
 				"invalid": "data",
@@ -191,7 +195,8 @@ func (suite *RestApisTestSuite) TestUpdateWallet() {
 			},
 		},
 		{
-			name:     "GivingValidRequest_WhenUpdateWalletFail_ThenReturnInternalServerError",
+			name:     "GivingValidRequest_WhenWalletNotFound_ThenReturnNotFound",
+			userId:   "<UserID>",
 			walletId: "<WalletID>",
 			requestBody: api_gen.WalletRequest{
 				Name:        "Updated Wallet",
@@ -199,7 +204,26 @@ func (suite *RestApisTestSuite) TestUpdateWallet() {
 			},
 			mock: func() {
 				suite.mockWalletService.EXPECT().
-					HandleUpdateInfo("<WalletID>", gomock.Any()).
+					HandleUpdateInfo("<UserID>", "<WalletID>", gomock.Any()).
+					Return(gorm.ErrRecordNotFound)
+			},
+			expectedStatus: http.StatusNotFound,
+			expectedError: &api_gen.ErrorResponse{
+				ErrorCode:    "404",
+				ErrorMessage: "Wallet not found",
+			},
+		},
+		{
+			name:     "GivingValidRequest_WhenUpdateWalletFail_ThenReturnInternalServerError",
+			userId:   "<UserID>",
+			walletId: "<WalletID>",
+			requestBody: api_gen.WalletRequest{
+				Name:        "Updated Wallet",
+				Description: null.StringFrom("Description").Ptr(),
+			},
+			mock: func() {
+				suite.mockWalletService.EXPECT().
+					HandleUpdateInfo("<UserID>", "<WalletID>", gomock.Any()).
 					Return(fmt.Errorf("service error"))
 			},
 			expectedStatus: http.StatusInternalServerError,
@@ -236,6 +260,7 @@ func (suite *RestApisTestSuite) TestUpdateWallet() {
 func (suite *RestApisTestSuite) TestDeleteWallet() {
 	tests := []struct {
 		name           string
+		userId         string
 		walletId       string
 		mock           func()
 		expectedStatus int
@@ -243,20 +268,37 @@ func (suite *RestApisTestSuite) TestDeleteWallet() {
 	}{
 		{
 			name:     "GivingValidWalletId_WhenDeleteWalletSuccess_ThenReturnNoContent",
+			userId:   "<UserID>",
 			walletId: "<WalletID>",
 			mock: func() {
 				suite.mockWalletService.EXPECT().
-					HandleDelete("<WalletID>").
+					HandleDelete("<UserID>", "<WalletID>").
 					Return(nil)
 			},
 			expectedStatus: http.StatusNoContent,
 		},
 		{
-			name:     "GivingValidWalletId_WhenDeleteWalletFail_ThenReturnInternalServerError",
+			name:     "GivingValidRequest_WhenWalletNotFound_ThenReturnNotFound",
+			userId:   "<UserID>",
 			walletId: "<WalletID>",
 			mock: func() {
 				suite.mockWalletService.EXPECT().
-					HandleDelete("<WalletID>").
+					HandleDelete("<UserID>", "<WalletID>").
+					Return(gorm.ErrRecordNotFound)
+			},
+			expectedStatus: http.StatusNotFound,
+			expectedError: &api_gen.ErrorResponse{
+				ErrorCode:    "404",
+				ErrorMessage: "Wallet not found",
+			},
+		},
+		{
+			name:     "GivingValidWalletId_WhenDeleteWalletFail_ThenReturnInternalServerError",
+			userId:   "<UserID>",
+			walletId: "<WalletID>",
+			mock: func() {
+				suite.mockWalletService.EXPECT().
+					HandleDelete("<UserID>", "<WalletID>").
 					Return(fmt.Errorf("service error"))
 			},
 			expectedStatus: http.StatusInternalServerError,

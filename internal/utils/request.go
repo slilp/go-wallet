@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 )
 
 func GetPaginationParams(pageQuery, limitQuery *int) (int, int) {

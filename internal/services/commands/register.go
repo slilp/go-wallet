@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/repositories"
 	"github.com/slilp/go-wallet/internal/repositories/entity"
 	"golang.org/x/crypto/bcrypt"

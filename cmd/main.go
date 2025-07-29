@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/slilp/go-wallet/internal/api/restapis"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/config"
 	"github.com/slilp/go-wallet/internal/middleware"
-	"github.com/slilp/go-wallet/internal/port/restapis"
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/server"
 )
 

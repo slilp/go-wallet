@@ -5,9 +5,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/consts"
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/utils"
+	"gorm.io/gorm"
 )
 
 // (GET /secure/wallet/{walletId}/transactions)
@@ -19,6 +20,11 @@ func (h *HttpServer) ListWalletTransactions(ctx *gin.Context, walletId string, p
 
 	totalCount, listData, err := h.App.Queries.ListTransactionsService.Handle(userId, walletId, page, limit)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, api_gen.ErrorResponse{ErrorCode: "404", ErrorMessage: "Wallet not found"})
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, api_gen.ErrorResponse{ErrorCode: "500", ErrorMessage: "Failed to list wallets"})
 		return
 	}

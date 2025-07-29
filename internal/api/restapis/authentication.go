@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/utils"
 )
 

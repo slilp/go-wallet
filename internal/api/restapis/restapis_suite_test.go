@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/slilp/go-wallet/internal/port/restapis"
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/api/restapis"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/server"
 	mock_commands "github.com/slilp/go-wallet/internal/services/commands/mocks"
 	mock_queries "github.com/slilp/go-wallet/internal/services/queries/mocks"

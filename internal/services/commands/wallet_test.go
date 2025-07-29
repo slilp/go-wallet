@@ -2,23 +2,15 @@ package commands_test
 
 import (
 	"errors"
-	"testing"
 
 	"github.com/aarondl/null/v9"
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/repositories/entity"
-	mock_repositories "github.com/slilp/go-wallet/internal/repositories/mocks"
-	"github.com/slilp/go-wallet/internal/services/commands"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/mock/gomock"
+	"gorm.io/gorm"
 )
 
-func TestWalletService_HandleCreate(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockWalletRepo := mock_repositories.NewMockWalletRepository(ctrl)
-	service := commands.NewWalletService(mockWalletRepo)
+func (suite *CommandsTestSuite) TestWalletService_HandleCreate() {
 
 	testCases := []struct {
 		name        string
@@ -36,7 +28,7 @@ func TestWalletService_HandleCreate(t *testing.T) {
 				Description: nil,
 			},
 			mock: func() {
-				mockWalletRepo.EXPECT().
+				suite.mockWalletRepo.EXPECT().
 					Create(entity.Wallet{
 						UserID:      "<UserID>",
 						Name:        "<WalletName>",
@@ -55,7 +47,7 @@ func TestWalletService_HandleCreate(t *testing.T) {
 				Description: nil,
 			},
 			mock: func() {
-				mockWalletRepo.EXPECT().
+				suite.mockWalletRepo.EXPECT().
 					Create(entity.Wallet{
 						UserID:      "<UserID>",
 						Name:        "<WalletName>",
@@ -69,27 +61,23 @@ func TestWalletService_HandleCreate(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+		suite.Run(tc.name, func() {
 			tc.mock()
-			err := service.HandleCreate(tc.userId, tc.req)
+			err := suite.walletService.HandleCreate(tc.userId, tc.req)
 			if tc.wantErr {
-				assert.EqualError(t, err, tc.expectedErr)
+				assert.EqualError(suite.T(), err, tc.expectedErr)
 			} else {
-				assert.NoError(t, err)
+				assert.NoError(suite.T(), err)
 			}
 		})
 	}
 }
 
-func TestWalletService_HandleDelete(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockWalletRepo := mock_repositories.NewMockWalletRepository(ctrl)
-	service := commands.NewWalletService(mockWalletRepo)
+func (suite *CommandsTestSuite) TestWalletService_HandleDelete() {
 
 	testCases := []struct {
 		name        string
+		userId      string
 		walletId    string
 		mock        func()
 		wantErr     bool
@@ -97,18 +85,38 @@ func TestWalletService_HandleDelete(t *testing.T) {
 	}{
 		{
 			name:     "GivenValidWalletId_WhenDeleteSuccess_ThenSuccess",
+			userId:   "<UserID>",
 			walletId: "<WalletID>",
 			mock: func() {
-				mockWalletRepo.EXPECT().Delete("<WalletID>").Return(nil)
+				suite.mockWalletRepo.EXPECT().
+					QueryByIdAndUser("<UserID>", "<WalletID>").
+					Return(nil, nil)
+				suite.mockWalletRepo.EXPECT().Delete("<WalletID>").Return(nil)
 			},
 			wantErr:     false,
 			expectedErr: "",
 		},
 		{
-			name:     "GivenValidWalletId_WhenDeleteFails_ThenError",
+			name:     "GivenInvalidWalletId_WhenNotFound_ThenError",
+			userId:   "<UserID>",
 			walletId: "<WalletID>",
 			mock: func() {
-				mockWalletRepo.EXPECT().Delete("<WalletID>").Return(errors.New("delete error"))
+				suite.mockWalletRepo.EXPECT().
+					QueryByIdAndUser("<UserID>", "<WalletID>").
+					Return(nil, gorm.ErrRecordNotFound)
+			},
+			wantErr:     true,
+			expectedErr: "record not found",
+		},
+		{
+			name:     "GivenValidWalletId_WhenDeleteFail_ThenError",
+			userId:   "<UserID>",
+			walletId: "<WalletID>",
+			mock: func() {
+				suite.mockWalletRepo.EXPECT().
+					QueryByIdAndUser("<UserID>", "<WalletID>").
+					Return(nil, nil)
+				suite.mockWalletRepo.EXPECT().Delete("<WalletID>").Return(errors.New("delete error"))
 			},
 			wantErr:     true,
 			expectedErr: "delete error",
@@ -116,27 +124,23 @@ func TestWalletService_HandleDelete(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+		suite.Run(tc.name, func() {
 			tc.mock()
-			err := service.HandleDelete(tc.walletId)
+			err := suite.walletService.HandleDelete(tc.userId, tc.walletId)
 			if tc.wantErr {
-				assert.EqualError(t, err, tc.expectedErr)
+				assert.EqualError(suite.T(), err, tc.expectedErr)
 			} else {
-				assert.NoError(t, err)
+				assert.NoError(suite.T(), err)
 			}
 		})
 	}
 }
 
-func TestWalletService_HandleUpdateInfo(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockWalletRepo := mock_repositories.NewMockWalletRepository(ctrl)
-	service := commands.NewWalletService(mockWalletRepo)
+func (suite *CommandsTestSuite) TestWalletService_HandleUpdateInfo() {
 
 	testCases := []struct {
 		name        string
+		userId      string
 		walletId    string
 		req         api_gen.WalletRequest
 		mock        func()
@@ -145,26 +149,50 @@ func TestWalletService_HandleUpdateInfo(t *testing.T) {
 	}{
 		{
 			name:     "GivingValidWalletId_WhenUpdateSuccess_ThenSuccess",
+			userId:   "<UserID>",
 			walletId: "<WalletID>",
 			req: api_gen.WalletRequest{
 				Name:        "<EditWalletName>",
 				Description: null.StringFrom("<EditDescription>").Ptr(),
 			},
 			mock: func() {
-				mockWalletRepo.EXPECT().UpdateInfo("<WalletID>", "<EditWalletName>", null.StringFrom("<EditDescription>").Ptr()).Return(nil)
+				suite.mockWalletRepo.EXPECT().
+					QueryByIdAndUser("<UserID>", "<WalletID>").
+					Return(nil, nil)
+				suite.mockWalletRepo.EXPECT().UpdateInfo("<WalletID>", "<EditWalletName>", null.StringFrom("<EditDescription>").Ptr()).Return(nil)
 			},
 			wantErr:     false,
 			expectedErr: "",
 		},
 		{
-			name:     "GivingValidWalletId_WhenUpdateFails_ThenError",
+			name:     "GivingInvalidWalletId_WhenNotFound_ThenError",
+			userId:   "<UserID>",
 			walletId: "<WalletID>",
 			req: api_gen.WalletRequest{
 				Name:        "<EditWalletName>",
 				Description: null.StringFrom("<EditDescription>").Ptr(),
 			},
 			mock: func() {
-				mockWalletRepo.EXPECT().UpdateInfo("<WalletID>", "<EditWalletName>", null.StringFrom("<EditDescription>").Ptr()).Return(errors.New("update error"))
+				suite.mockWalletRepo.EXPECT().
+					QueryByIdAndUser("<UserID>", "<WalletID>").
+					Return(nil, gorm.ErrRecordNotFound)
+			},
+			wantErr:     true,
+			expectedErr: "record not found",
+		},
+		{
+			name:     "GivingValidWalletId_WhenUpdateFail_ThenError",
+			userId:   "<UserID>",
+			walletId: "<WalletID>",
+			req: api_gen.WalletRequest{
+				Name:        "<EditWalletName>",
+				Description: null.StringFrom("<EditDescription>").Ptr(),
+			},
+			mock: func() {
+				suite.mockWalletRepo.EXPECT().
+					QueryByIdAndUser("<UserID>", "<WalletID>").
+					Return(nil, nil)
+				suite.mockWalletRepo.EXPECT().UpdateInfo("<WalletID>", "<EditWalletName>", null.StringFrom("<EditDescription>").Ptr()).Return(errors.New("update error"))
 			},
 			wantErr:     true,
 			expectedErr: "update error",
@@ -172,13 +200,13 @@ func TestWalletService_HandleUpdateInfo(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+		suite.Run(tc.name, func() {
 			tc.mock()
-			err := service.HandleUpdateInfo(tc.walletId, tc.req)
+			err := suite.walletService.HandleUpdateInfo(tc.userId, tc.walletId, tc.req)
 			if tc.wantErr {
-				assert.EqualError(t, err, tc.expectedErr)
+				assert.EqualError(suite.T(), err, tc.expectedErr)
 			} else {
-				assert.NoError(t, err)
+				assert.NoError(suite.T(), err)
 			}
 		})
 	}

@@ -8,8 +8,9 @@ import (
 	"net/http/httptest"
 	"strconv"
 
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/consts"
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"gorm.io/gorm"
 )
 
 func (suite *RestApisTestSuite) TestTransferBalance() {
@@ -241,6 +242,18 @@ func (suite *RestApisTestSuite) TestListWalletTransactions() {
 			wantStatus:     http.StatusOK,
 			wantErr:        false,
 			expectedTxsLen: 2,
+		},
+		{
+			name:     "GivingValidRequest_WhenListWalletTransactionsNotFound_ThenReturnNotFound",
+			walletId: "<Wallet1>",
+			mock: func() {
+				suite.mockListTransactionsService.EXPECT().
+					Handle("<UserID>", "<Wallet1>", 1, 30).
+					Return(int64(0), nil, gorm.ErrRecordNotFound)
+			},
+			wantStatus:  http.StatusNotFound,
+			wantErr:     true,
+			expectedErr: "Wallet not found",
 		},
 		{
 			name:     "GivingValidRequest_WhenListWalletTransactionsFail_ThenReturnInternalServerError",

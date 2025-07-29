@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	mock_repositories "github.com/slilp/go-wallet/internal/repositories/mocks"
 	"go.uber.org/mock/gomock"
 )

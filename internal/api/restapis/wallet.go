@@ -1,11 +1,13 @@
 package restapis
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/utils"
+	"gorm.io/gorm"
 )
 
 // (POST /secure/wallet)
@@ -48,7 +50,14 @@ func (h *HttpServer) UpdateWallet(ctx *gin.Context, walletId string) {
 		return
 	}
 
-	if err := h.App.Commands.WalletService.HandleUpdateInfo(walletId, req); err != nil {
+	userId := utils.GetMiddlewareUserId(ctx)
+
+	if err := h.App.Commands.WalletService.HandleUpdateInfo(userId, walletId, req); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, api_gen.ErrorResponse{ErrorCode: "404", ErrorMessage: "Wallet not found"})
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, api_gen.ErrorResponse{ErrorCode: "500", ErrorMessage: "Failed to update wallet"})
 		return
 	}
@@ -59,7 +68,14 @@ func (h *HttpServer) UpdateWallet(ctx *gin.Context, walletId string) {
 // (DELETE /secure/wallet/{walletId})
 func (h *HttpServer) DeleteWallet(ctx *gin.Context, walletId string) {
 
-	if err := h.App.Commands.WalletService.HandleDelete(walletId); err != nil {
+	userId := utils.GetMiddlewareUserId(ctx)
+
+	if err := h.App.Commands.WalletService.HandleDelete(userId, walletId); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, api_gen.ErrorResponse{ErrorCode: "404", ErrorMessage: "Wallet not found"})
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, api_gen.ErrorResponse{ErrorCode: "500", ErrorMessage: "Failed to delete wallet"})
 		return
 	}

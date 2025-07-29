@@ -12,7 +12,7 @@ package mock_commands
 import (
 	reflect "reflect"
 
-	api_gen "github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	api_gen "github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	gomock "go.uber.org/mock/gomock"
 )
 

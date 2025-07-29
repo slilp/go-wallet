@@ -12,7 +12,7 @@ package mock_commands
 import (
 	reflect "reflect"
 
-	api_gen "github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	api_gen "github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -55,29 +55,29 @@ func (mr *MockWalletServiceMockRecorder) HandleCreate(userId, req any) *gomock.C
 }
 
 // HandleDelete mocks base method.
-func (m *MockWalletService) HandleDelete(walletId string) error {
+func (m *MockWalletService) HandleDelete(userId, walletId string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HandleDelete", walletId)
+	ret := m.ctrl.Call(m, "HandleDelete", userId, walletId)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // HandleDelete indicates an expected call of HandleDelete.
-func (mr *MockWalletServiceMockRecorder) HandleDelete(walletId any) *gomock.Call {
+func (mr *MockWalletServiceMockRecorder) HandleDelete(userId, walletId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleDelete", reflect.TypeOf((*MockWalletService)(nil).HandleDelete), walletId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleDelete", reflect.TypeOf((*MockWalletService)(nil).HandleDelete), userId, walletId)
 }
 
 // HandleUpdateInfo mocks base method.
-func (m *MockWalletService) HandleUpdateInfo(walletId string, req api_gen.WalletRequest) error {
+func (m *MockWalletService) HandleUpdateInfo(userId, walletId string, req api_gen.WalletRequest) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HandleUpdateInfo", walletId, req)
+	ret := m.ctrl.Call(m, "HandleUpdateInfo", userId, walletId, req)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // HandleUpdateInfo indicates an expected call of HandleUpdateInfo.
-func (mr *MockWalletServiceMockRecorder) HandleUpdateInfo(walletId, req any) *gomock.Call {
+func (mr *MockWalletServiceMockRecorder) HandleUpdateInfo(userId, walletId, req any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleUpdateInfo", reflect.TypeOf((*MockWalletService)(nil).HandleUpdateInfo), walletId, req)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleUpdateInfo", reflect.TypeOf((*MockWalletService)(nil).HandleUpdateInfo), userId, walletId, req)
 }

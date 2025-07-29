@@ -3,7 +3,7 @@ package queries_test
 import (
 	"errors"
 
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/repositories/entity"
 	mock_repositories "github.com/slilp/go-wallet/internal/repositories/mocks"
 	"golang.org/x/crypto/bcrypt"

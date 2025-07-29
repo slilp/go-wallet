@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/aarondl/null/v9"
-	"github.com/slilp/go-wallet/internal/port/restapis/api_gen"
+	"github.com/slilp/go-wallet/internal/api/restapis/api_gen"
 	"github.com/slilp/go-wallet/internal/repositories/entity"
 	"gorm.io/gorm"
 )

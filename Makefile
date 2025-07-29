@@ -8,10 +8,10 @@ tidy:
 	go mod tidy
 	
 generate-gen:
-	@rm -rf ./internal/port/restapis/api_gen/*
-	@mkdir -p ./internal/port/restapis/api_gen
-	$(shell go env GOPATH)/bin/oapi-codegen -package=api_gen --generate types -o ./internal/port/restapis/api_gen/openapi_types.gen.go ./docs/server.yml 
-	$(shell go env GOPATH)/bin/oapi-codegen -package=api_gen --generate gin -o ./internal/port/restapis/api_gen/openapi_api.gen.go ./docs/server.yml
+	@rm -rf ./internal/api/restapis/api_gen/*
+	@mkdir -p ./internal/api/restapis/api_gen
+	$(shell go env GOPATH)/bin/oapi-codegen -package=api_gen --generate types -o ./internal/api/restapis/api_gen/openapi_types.gen.go ./docs/server.yml 
+	$(shell go env GOPATH)/bin/oapi-codegen -package=api_gen --generate gin -o ./internal/api/restapis/api_gen/openapi_api.gen.go ./docs/server.yml
 
 generate-mock:
 	go generate ./...
