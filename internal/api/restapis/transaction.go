@@ -54,6 +54,11 @@ func (h *HttpServer) TransferBalance(ctx *gin.Context) {
 			return
 		}
 
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, api_gen.ErrorResponse{ErrorCode: "404", ErrorMessage: "Wallet not found"})
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, api_gen.ErrorResponse{ErrorCode: "500", ErrorMessage: "Fail to transfer"})
 		return
 	}
@@ -71,6 +76,11 @@ func (h *HttpServer) DepositPoints(ctx *gin.Context) {
 	userId := utils.GetMiddlewareUserId(ctx)
 
 	if err := h.App.Commands.TransactionService.HandleDepositWithDrawBalance(userId, req.WalletId, req.Amount); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, api_gen.ErrorResponse{ErrorCode: "404", ErrorMessage: "Wallet not found"})
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, api_gen.ErrorResponse{ErrorCode: "500", ErrorMessage: "Fail to deposit"})
 		return
 	}
@@ -88,6 +98,11 @@ func (h *HttpServer) WithdrawPoints(ctx *gin.Context) {
 	userId := utils.GetMiddlewareUserId(ctx)
 
 	if err := h.App.Commands.TransactionService.HandleDepositWithDrawBalance(userId, req.WalletId, -req.Amount); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, api_gen.ErrorResponse{ErrorCode: "404", ErrorMessage: "Wallet not found"})
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, api_gen.ErrorResponse{ErrorCode: "500", ErrorMessage: "Fail to withdraw"})
 		return
 	}

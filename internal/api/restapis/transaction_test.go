@@ -54,6 +54,22 @@ func (suite *RestApisTestSuite) TestTransferBalance() {
 			expectedErr: "Insufficient balance",
 		},
 		{
+			name: "GivingInvalidWalletId_WhenNotFound_ThenReturnNotFound",
+			reqBody: api_gen.TransferRequest{
+				FromWalletId: "<Wallet1>",
+				ToWalletId:   "<Wallet2>",
+				Amount:       100,
+			},
+			mock: func() {
+				suite.mockTransactionService.EXPECT().
+					HandleTransferBalance("<UserID>", "<Wallet1>", "<Wallet2>", float64(100)).
+					Return(gorm.ErrRecordNotFound)
+			},
+			wantStatus:  http.StatusNotFound,
+			wantErr:     true,
+			expectedErr: "Wallet not found",
+		},
+		{
 			name: "GivingValidRequest_WhenTransferBalanceFail_ThenReturnInternalServerError",
 			reqBody: api_gen.TransferRequest{
 				FromWalletId: "<Wallet1>",
@@ -114,6 +130,21 @@ func (suite *RestApisTestSuite) TestDepositPoints() {
 			wantErr:    false,
 		},
 		{
+			name: "GivingInvalidRequest_WhenNotFound_ThenReturnNotFound",
+			reqBody: api_gen.DepositRequest{
+				WalletId: "<Wallet1>",
+				Amount:   100,
+			},
+			mock: func() {
+				suite.mockTransactionService.EXPECT().
+					HandleDepositWithDrawBalance("<UserID>", "<Wallet1>", float64(100)).
+					Return(gorm.ErrRecordNotFound)
+			},
+			wantStatus:  http.StatusNotFound,
+			wantErr:     true,
+			expectedErr: "Wallet not found",
+		},
+		{
 			name: "GivingValidRequest_WhenDepositPointsFail_ThenReturnInternalServerError",
 			reqBody: api_gen.DepositRequest{
 				WalletId: "<Wallet1>",
@@ -171,6 +202,21 @@ func (suite *RestApisTestSuite) TestWithdrawPoints() {
 			},
 			wantStatus: http.StatusOK,
 			wantErr:    false,
+		},
+		{
+			name: "GivingInvalidRequest_WhenNotFound_ThenReturnNotFound",
+			reqBody: api_gen.WithdrawRequest{
+				WalletId: "<Wallet1>",
+				Amount:   100,
+			},
+			mock: func() {
+				suite.mockTransactionService.EXPECT().
+					HandleDepositWithDrawBalance("<UserID>", "<Wallet1>", float64(-100)).
+					Return(gorm.ErrRecordNotFound)
+			},
+			wantStatus:  http.StatusNotFound,
+			wantErr:     true,
+			expectedErr: "Wallet not found",
 		},
 		{
 			name: "GivingValidRequest_WhenWithdrawPointsFail_ThenReturnInternalServerError",
