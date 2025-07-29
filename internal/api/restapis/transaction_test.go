@@ -38,6 +38,19 @@ func (suite *RestApisTestSuite) TestTransferBalance() {
 			wantErr:    false,
 		},
 		{
+			name: "GivingFromToTheSameWallet_WhenTransferBalance_ThenReturnBadRequest",
+			reqBody: api_gen.TransferRequest{
+				FromWalletId: "<Wallet1>",
+				ToWalletId:   "<Wallet1>",
+				Amount:       100,
+			},
+			mock: func() {
+			},
+			wantStatus:  http.StatusBadRequest,
+			wantErr:     true,
+			expectedErr: "From and To wallet ID cannot be the same",
+		},
+		{
 			name: "GivingInsufficientBalance_WhenTransferBalance_ThenReturnBadRequest",
 			reqBody: api_gen.TransferRequest{
 				FromWalletId: "<Wallet1>",

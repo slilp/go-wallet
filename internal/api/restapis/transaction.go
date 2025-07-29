@@ -46,6 +46,11 @@ func (h *HttpServer) TransferBalance(ctx *gin.Context) {
 		return
 	}
 
+	if req.FromWalletId == req.ToWalletId {
+		ctx.JSON(http.StatusBadRequest, api_gen.ErrorResponse{ErrorCode: "400", ErrorMessage: "From and To wallet ID cannot be the same"})
+		return
+	}
+
 	userId := utils.GetMiddlewareUserId(ctx)
 
 	if err := h.App.Commands.TransactionService.HandleTransferBalance(userId, req.FromWalletId, req.ToWalletId, req.Amount); err != nil {

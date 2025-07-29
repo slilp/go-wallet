@@ -5,9 +5,7 @@ CREATE TABLE "transactions" (
     "amount" DECIMAL(20, 2) NOT NULL,
     "type" VARCHAR(20) NOT NULL,
     "created_at" TIMESTAMP NOT NULL DEFAULT NOW(),
-    "updated_at" TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY ("from") REFERENCES "wallets"("id") ON DELETE CASCADE,
-    FOREIGN KEY ("to") REFERENCES "wallets"("id") ON DELETE CASCADE
+    "updated_at" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX "idx_transactions_from_created_at" ON "transactions"("from", "created_at" DESC);
